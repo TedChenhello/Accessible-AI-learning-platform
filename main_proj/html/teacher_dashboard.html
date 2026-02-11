@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>教师管理后台 - 无障碍AI学习平台</title>
+    
+    <style>
+        /* ==================== 基础样式 ==================== */
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f5f5f5;
+            --text-primary: #212121;
+            --text-secondary: #666666;
+            --accent-color: #1a73e8;
+            --success-color: #34a853;
+            --warning-color: #fbbc04;
+            --error-color: #ea4335;
+            --border-color: #e0e0e0;
+            
+            --spacing-xs: 8px;
+            --spacing-sm: 12px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+                         "Microsoft YaHei", sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background-color: var(--bg-secondary);
+            min-height: 100vh;
+        }
+        
+        /* ==================== 顶部导航栏 ==================== */
+        .top-nav {
+            background-color: var(--accent-color);
+            color: white;
+            padding: var(--spacing-md) var(--spacing-lg);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .nav-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: var(--spacing-md);
+        }
+
+        .nav-btn {
+            background-color: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            background-color: rgba(255,255,255,0.3);
+        }
+        
+        /* ==================== 主容器 ==================== */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--spacing-xl) var(--spacing-md);
+        }
+        
+        .page-header {
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .page-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+        }
+        
+        /* ==================== 标签页导航 ==================== */
+        .tabs {
+            display: flex;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-lg);
+            border-bottom: 2px solid var(--border-color);
+        }
+        
+        .tab-btn {
+            padding: var(--spacing-md) var(--spacing-lg);
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .tab-btn:hover {
+            color: var(--accent-color);
+        }
+        
+        .tab-btn.active {
+            color: var(--accent-color);
+            border-bottom-color: var(--accent-color);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* ==================== 表单样式 ==================== */
+        .form-card {
+            background-color: var(--bg-primary);
+            border-radius: 12px;
+            padding: var(--spacing-lg);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .form-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: var(--spacing-lg);
+            color: var(--text-primary);
+        }
+        
+        .form-group {
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .form-input,
+        .form-textarea,
+        .form-select {
+            width: 100%;
+            padding: var(--spacing-sm);
+            font-size: 14px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            transition: border-color 0.2s;
+        }
+        
+        .form-input:focus,
+        .form-textarea:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+        
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .form-hint {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: var(--spacing-xs);
+        }
+        
+        /* ==================== 按钮样式 ==================== */
+        .btn {
+            padding: var(--spacing-sm) var(--spacing-lg);
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-height: 40px;
+        }
+        
+        .btn-primary {
+            background-color: var(--accent-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #1557b0;
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #2d8e47;
+        }
+        
+        .btn-secondary {
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--border-color);
+        }
+        
+        /* ==================== 文件上传样式 ==================== */
+        .file-upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: var(--spacing-lg);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .file-upload-area:hover {
+            border-color: var(--accent-color);
+            background-color: rgba(26, 115, 232, 0.05);
+        }
+        
+        .file-upload-icon {
+            font-size: 48px;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .file-upload-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .file-preview {
+            margin-top: var(--spacing-md);
+            padding: var(--spacing-sm);
+            background-color: var(--bg-secondary);
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        /* ==================== 任务管理样式 ==================== */
+        .tasks-list {
+            margin-bottom: var(--spacing-md);
+        }
+
+        .task-item {
+            background-color: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .task-number {
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+
+        .task-remove-btn {
+            background-color: var(--error-color);
+            color: white;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .task-remove-btn:hover {
+            opacity: 0.8;
+        }
+
+        /* ==================== 列表样式 ==================== */
+        .item-list {
+            list-style: none;
+        }
+        
+        .item-card {
+            background-color: var(--bg-primary);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .item-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .item-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+        
+        .item-content {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .item-meta {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <nav class="top-nav">
+        <div class="nav-left">
+            <button class="nav-btn" id="returnBtn">
+                ← 返回
+            </button>
+            <div class="nav-title">📚 教师管理后台</div>
+        </div>
+        <div class="nav-actions">
+            <button class="nav-btn" onclick="window.location.href='qianduan.html'">
+                返回首页
+            </button>
+        </div>
+    </nav>
+    
+    <!-- 主容器 -->
+    <div class="container">
+        <header class="page-header">
+            <h1 class="page-title">课程与作业管理</h1>
+            <p class="page-subtitle">创建课程、布置作业、管理学习内容</p>
+        </header>
+        
+        <!-- 标签页导航 -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="courses">课程管理</button>
+            <button class="tab-btn" data-tab="homework">作业管理</button>
+            <button class="tab-btn" data-tab="progress">学生进度监控</button>
+        </div>
+        
+        <!-- 课程管理标签页 -->
+        <div class="tab-content active" id="courses-tab">
+            <!-- 创建课程表单 -->
+            <div class="form-card">
+                <h2 class="form-title">➕ 创建新课程</h2>
+                <form id="courseForm">
+                    <div class="form-group">
+                        <label class="form-label" for="courseTitle">课程标题 *</label>
+                        <input type="text" id="courseTitle" class="form-input" 
+                               placeholder="例如：AI图像生成入门" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="courseDescription">课程描述 *</label>
+                        <textarea id="courseDescription" class="form-textarea" 
+                                  placeholder="简要描述课程内容和学习目标..." required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="courseContent">课程文字内容</label>
+                        <textarea id="courseContent" class="form-textarea" 
+                                  placeholder="输入课程的详细文字内容..."></textarea>
+                        <p class="form-hint">可以包含学习步骤、知识点讲解等</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="courseVideo">课程视频</label>
+                        <div class="file-upload-area" onclick="document.getElementById('courseVideoInput').click()">
+                            <div class="file-upload-icon">🎥</div>
+                            <div class="file-upload-text">点击上传视频文件（支持MP4、AVI等格式）</div>
+                        </div>
+                        <input type="file" id="courseVideoInput" class="file-input" 
+                               accept="video/*" onchange="handleVideoUpload(this, 'courseVideoPreview')">
+                        <div id="courseVideoPreview" class="file-preview" style="display:none;"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="courseAILink">AI实践链接</label>
+                        <input type="url" id="courseAILink" class="form-input"
+                               placeholder="例如：https://chat.openai.com">
+                        <p class="form-hint">学生可以通过此链接跳转到AI工具进行实践</p>
+                    </div>
+
+                    <!-- 任务管理部分 -->
+                    <div class="form-group">
+                        <label class="form-label">课程任务</label>
+                        <p class="form-hint">为学生添加具体的学习任务，例如"给DeepSeek发送一段自我介绍"</p>
+
+                        <div id="tasksList" class="tasks-list">
+                            <!-- 任务列表将动态添加到这里 -->
+                        </div>
+
+                        <button type="button" class="btn btn-secondary" id="addTaskBtn">
+                            ➕ 添加任务
+                        </button>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">创建课程</button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- 作业管理标签页 -->
+        <div class="tab-content" id="homework-tab">
+            <!-- 布置作业表单 -->
+            <div class="form-card">
+                <h2 class="form-title">📝 布置新作业</h2>
+                <form id="homeworkForm">
+                    <div class="form-group">
+                        <label class="form-label" for="homeworkTitle">作业标题 *</label>
+                        <input type="text" id="homeworkTitle" class="form-input" 
+                               placeholder="例如：使用AI生成一张风景图片" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="homeworkDescription">作业要求 *</label>
+                        <textarea id="homeworkDescription" class="form-textarea" 
+                                  placeholder="详细描述作业要求、提交格式、评分标准等..." required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="homeworkAILink">AI工具链接</label>
+                        <input type="url" id="homeworkAILink" class="form-input" 
+                               placeholder="例如：https://www.midjourney.com">
+                        <p class="form-hint">学生可以使用此AI工具完成作业</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="homeworkDeadline">截止日期</label>
+                        <input type="date" id="homeworkDeadline" class="form-input">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success">布置作业</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- 学生进度监控标签页 -->
+        <div class="tab-content" id="progress-tab">
+            <div class="form-card">
+                <h2 class="form-title">📊 学生进度监控</h2>
+                <p class="form-hint">实时查看学生学习进度，及时发现需要帮助的学生</p>
+
+                <!-- 刷新按钮 -->
+                <button class="btn btn-primary" id="refreshProgressBtn" style="margin-bottom: 20px;">
+                    🔄 刷新数据
+                </button>
+
+                <!-- 卡住的学生警报 -->
+                <div id="stuckStudentsSection" style="margin-bottom: 30px;">
+                    <h3 style="color: var(--error-color); margin-bottom: 15px;">⚠️ 需要帮助的学生</h3>
+                    <div id="stuckStudentsList"></div>
+                </div>
+
+                <!-- 所有学生进度 -->
+                <div id="allProgressSection">
+                    <h3 style="margin-bottom: 15px;">📋 所有学生进度</h3>
+                    <div id="allProgressList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== URL参数处理 ====================
+        const urlParams = new URLSearchParams(window.location.search);
+        const action = urlParams.get('action');
+        const courseId = urlParams.get('courseId');
+
+        // 根据action参数切换到相应的标签页
+        if (action === 'homework') {
+            // 切换到作业管理标签页
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelector('[data-tab="homework"]').classList.add('active');
+            document.getElementById('homework-tab').classList.add('active');
+        } else if (action === 'edit' && courseId) {
+            // 编辑课程模式 - 保持在课程管理标签页
+            // 这里可以添加加载课程数据的逻辑
+            console.log('编辑课程ID:', courseId);
+        }
+        // action === 'create' 或默认情况下，显示课程管理标签页（默认已激活）
+
+        // ==================== 任务管理 ====================
+        let courseTasks = []; // 存储课程任务列表
+
+        // 添加任务按钮事件
+        document.getElementById('addTaskBtn').addEventListener('click', () => {
+            addNewTask();
+        });
+
+        // 添加新任务
+        function addNewTask() {
+            const taskId = `task_${Date.now()}`;
+            const task = {
+                taskId: taskId,
+                taskType: 'ai_chat',
+                taskTitle: '',
+                taskDescription: '',
+                taskParams: {
+                    aiPlatform: 'DeepSeek',
+                    promptTemplate: '',
+                    expectedLength: ''
+                },
+                order: courseTasks.length + 1
+            };
+
+            courseTasks.push(task);
+            renderTasks();
+        }
+
+        // 删除任务
+        function removeTask(taskId) {
+            courseTasks = courseTasks.filter(t => t.taskId !== taskId);
+            // 重新排序
+            courseTasks.forEach((task, index) => {
+                task.order = index + 1;
+            });
+            renderTasks();
+        }
+
+        // 渲染任务列表
+        function renderTasks() {
+            const tasksList = document.getElementById('tasksList');
+            tasksList.innerHTML = '';
+
+            courseTasks.forEach((task, index) => {
+                const taskItem = document.createElement('div');
+                taskItem.className = 'task-item';
+                taskItem.innerHTML = `
+                    <div class="task-header">
+                        <span class="task-number">任务 ${index + 1}</span>
+                        <button type="button" class="task-remove-btn" onclick="removeTask('${task.taskId}')">删除</button>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">任务标题</label>
+                        <input type="text" class="form-input" value="${task.taskTitle}"
+                               onchange="updateTaskField('${task.taskId}', 'taskTitle', this.value)"
+                               placeholder="例如：与AI进行自我介绍">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">任务描述</label>
+                        <textarea class="form-textarea"
+                                  onchange="updateTaskField('${task.taskId}', 'taskDescription', this.value)"
+                                  placeholder="详细描述学生需要完成的任务...">${task.taskDescription}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">AI平台</label>
+                        <select class="form-input" onchange="updateTaskParam('${task.taskId}', 'aiPlatform', this.value)">
+                            <option value="DeepSeek" ${task.taskParams.aiPlatform === 'DeepSeek' ? 'selected' : ''}>DeepSeek</option>
+                            <option value="ChatGPT" ${task.taskParams.aiPlatform === 'ChatGPT' ? 'selected' : ''}>ChatGPT</option>
+                            <option value="Claude" ${task.taskParams.aiPlatform === 'Claude' ? 'selected' : ''}>Claude</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">提示词模板</label>
+                        <input type="text" class="form-input" value="${task.taskParams.promptTemplate}"
+                               onchange="updateTaskParam('${task.taskId}', 'promptTemplate', this.value)"
+                               placeholder="例如：你好，我是[你的名字]...">
+                    </div>
+                `;
+                tasksList.appendChild(taskItem);
+            });
+        }
+
+        // 更新任务字段
+        function updateTaskField(taskId, field, value) {
+            const task = courseTasks.find(t => t.taskId === taskId);
+            if (task) {
+                task[field] = value;
+            }
+        }
+
+        // 更新任务参数
+        function updateTaskParam(taskId, param, value) {
+            const task = courseTasks.find(t => t.taskId === taskId);
+            if (task) {
+                task.taskParams[param] = value;
+            }
+        }
+
+        // ==================== 返回按钮 ====================
+        const returnBtn = document.getElementById('returnBtn');
+        if (returnBtn) {
+            returnBtn.addEventListener('click', () => {
+                window.location.href = 'course_selection.html?mode=teacher';
+            });
+        }
+
+        // ==================== 标签页切换 ====================
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                // 移除所有active类
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // 添加active类到当前标签
+                btn.classList.add('active');
+                const tabId = btn.dataset.tab + '-tab';
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+        
+        // ==================== 文件上传处理 ====================
+        function handleVideoUpload(input, previewId) {
+            const file = input.files[0];
+            const preview = document.getElementById(previewId);
+            
+            if (file) {
+                preview.style.display = 'block';
+                preview.innerHTML = `
+                    <strong>已选择文件：</strong> ${file.name} 
+                    <br><strong>文件大小：</strong> ${(file.size / 1024 / 1024).toFixed(2)} MB
+                `;
+            } else {
+                preview.style.display = 'none';
+            }
+        }
+        
+        // ==================== 课程表单提交 ====================
+        document.getElementById('courseForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const courseData = {
+                title: document.getElementById('courseTitle').value,
+                description: document.getElementById('courseDescription').value,
+                content: document.getElementById('courseContent').value,
+                videoUrl: document.getElementById('courseVideoInput').files[0]?.name || '',
+                aiToolLinks: [],
+                tasks: courseTasks, // 包含任务数据
+                createdBy: 'teacher_001'
+            };
+
+            // 如果有AI链接，添加到aiToolLinks数组
+            const aiLink = document.getElementById('courseAILink').value;
+            if (aiLink) {
+                courseData.aiToolLinks.push({
+                    name: 'AI工具',
+                    url: aiLink
+                });
+            }
+
+            try {
+                // 发送到后端API
+                const response = await fetch('http://localhost:3000/api/courses', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(courseData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('课程创建成功！\n\n课程标题：' + courseData.title + '\n任务数量：' + courseTasks.length);
+
+                    // 重置表单和任务列表
+                    e.target.reset();
+                    document.getElementById('courseVideoPreview').style.display = 'none';
+                    courseTasks = [];
+                    renderTasks();
+                } else {
+                    alert('课程创建失败：' + result.message);
+                }
+            } catch (error) {
+                console.error('创建课程时出错:', error);
+                alert('创建课程失败，请确保后端服务器已启动。\n\n错误信息：' + error.message);
+            }
+        });
+        
+        // ==================== 作业表单提交 ====================
+        document.getElementById('homeworkForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const homeworkData = {
+                title: document.getElementById('homeworkTitle').value,
+                description: document.getElementById('homeworkDescription').value,
+                aiLink: document.getElementById('homeworkAILink').value,
+                deadline: document.getElementById('homeworkDeadline').value,
+                createdAt: new Date().toISOString()
+            };
+            
+            // 这里暂时只是显示提示，实际应该发送到后端
+            alert('作业布置成功！\n\n作业标题：' + homeworkData.title + '\n\n注意：当前为演示模式，数据未保存到服务器。');
+            
+            // 重置表单
+            e.target.reset();
+        });
+
+        // ==================== 学生进度监控 ====================
+        // 获取所有学生进度
+        async function loadAllProgress() {
+            try {
+                const response = await fetch('http://localhost:3000/api/progress/all');
+                const data = await response.json();
+
+                if (data.success) {
+                    displayAllProgress(data.progress);
+                }
+            } catch (error) {
+                console.error('获取学生进度失败:', error);
+            }
+        }
+
+        // 获取卡住的学生
+        async function loadStuckStudents() {
+            try {
+                const response = await fetch('http://localhost:3000/api/progress/stuck');
+                const data = await response.json();
+
+                if (data.success) {
+                    displayStuckStudents(data.stuckStudents);
+                }
+            } catch (error) {
+                console.error('获取卡住学生失败:', error);
+            }
+        }
+
+        // 显示卡住的学生
+        function displayStuckStudents(stuckStudents) {
+            const container = document.getElementById('stuckStudentsList');
+
+            if (stuckStudents.length === 0) {
+                container.innerHTML = '<p style="color: var(--success-color);">✅ 目前没有学生需要帮助</p>';
+                return;
+            }
+
+            let html = '<ul class="item-list">';
+            stuckStudents.forEach(progress => {
+                const stuckTime = calculateTimeDiff(progress.lastActivity);
+                html += `
+                    <li class="item-card" style="border-left: 4px solid var(--error-color);">
+                        <div class="item-header">
+                            <div>
+                                <span class="item-title">学生ID: ${progress.studentId}</span>
+                                <span style="color: var(--text-secondary); margin-left: 10px;">课程: ${progress.courseId}</span>
+                            </div>
+                        </div>
+                        <div class="item-content">
+                            <strong>卡在任务 ${progress.taskIndex + 1}</strong> - 已停留 ${stuckTime}
+                        </div>
+                        <div class="item-meta">
+                            访问次数: ${progress.visitCount || 1} 次 | 最后活动: ${formatDateTime(progress.lastActivity)}
+                        </div>
+                    </li>
+                `;
+            });
+            html += '</ul>';
+            container.innerHTML = html;
+        }
+
+        // 显示所有学生进度
+        function displayAllProgress(progressList) {
+            const container = document.getElementById('allProgressList');
+
+            if (progressList.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-secondary);">暂无学生进度数据</p>';
+                return;
+            }
+
+            let html = '<ul class="item-list">';
+            progressList.forEach(progress => {
+                const statusColor = progress.completed ? 'var(--success-color)' : 'var(--warning-color)';
+                const statusText = progress.completed ? '✅ 已完成' : '⏳ 进行中';
+                const timeDiff = calculateTimeDiff(progress.lastActivity);
+
+                html += `
+                    <li class="item-card">
+                        <div class="item-header">
+                            <div>
+                                <span class="item-title">学生ID: ${progress.studentId}</span>
+                                <span style="color: ${statusColor}; margin-left: 10px;">${statusText}</span>
+                            </div>
+                        </div>
+                        <div class="item-content">
+                            课程: ${progress.courseId} | 任务 ${progress.taskIndex + 1}
+                        </div>
+                        <div class="item-meta">
+                            开始时间: ${formatDateTime(progress.startTime)} |
+                            最后活动: ${formatDateTime(progress.lastActivity)} (${timeDiff}前) |
+                            访问次数: ${progress.visitCount || 1} 次
+                        </div>
+                    </li>
+                `;
+            });
+            html += '</ul>';
+            container.innerHTML = html;
+        }
+
+        // 计算时间差
+        function calculateTimeDiff(dateString) {
+            const now = new Date();
+            const past = new Date(dateString);
+            const diffMs = now - past;
+            const diffMins = Math.floor(diffMs / 60000);
+
+            if (diffMins < 1) return '刚刚';
+            if (diffMins < 60) return `${diffMins}分钟`;
+            const diffHours = Math.floor(diffMins / 60);
+            if (diffHours < 24) return `${diffHours}小时`;
+            const diffDays = Math.floor(diffHours / 24);
+            return `${diffDays}天`;
+        }
+
+        // 格式化日期时间
+        function formatDateTime(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // 刷新进度数据
+        document.getElementById('refreshProgressBtn').addEventListener('click', async () => {
+            await loadStuckStudents();
+            await loadAllProgress();
+        });
+
+        // 标签页切换时加载数据
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                if (btn.dataset.tab === 'progress') {
+                    await loadStuckStudents();
+                    await loadAllProgress();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

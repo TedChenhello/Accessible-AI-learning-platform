@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <meta name="description" content="无障碍AI学习平台 - 课程选择">
+    <title>课程选择 - 无障碍AI学习平台</title>
+
+    <style>
+        /* ==================== 基础样式 ==================== */
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f5f5f5;
+            --text-primary: #212121;
+            --text-secondary: #666666;
+            --accent-color: #1a73e8;
+            --success-color: #34a853;
+            --disabled-color: #cccccc;
+            --border-color: #e0e0e0;
+
+            --font-size-base: 16px;
+            --font-scale: 1;
+
+            --spacing-xs: 8px;
+            --spacing-sm: 12px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+                         "Microsoft YaHei", sans-serif;
+            font-size: var(--font-size-base);
+            line-height: 1.6;
+            color: var(--text-primary);
+            background-color: var(--bg-secondary);
+            min-height: 100vh;
+        }
+
+        /* ==================== 顶部导航栏 - 线性布局 ==================== */
+        .top-nav {
+            background-color: var(--accent-color);
+            color: white;
+            padding: var(--spacing-lg);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .nav-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: var(--spacing-md);
+            text-align: center;
+        }
+
+        .user-mode-badge {
+            background-color: rgba(255,255,255,0.3);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 16px;
+            display: block;
+            text-align: center;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .nav-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .nav-btn {
+            background-color: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-height: 56px;
+            text-align: left;
+            width: 100%;
+        }
+
+        .nav-btn:hover {
+            background-color: rgba(255,255,255,0.3);
+            transform: translateX(4px);
+        }
+
+        .nav-btn:focus {
+            outline: 3px solid white;
+            outline-offset: 2px;
+        }
+
+        /* ==================== 主容器 ==================== */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--spacing-xl) var(--spacing-md);
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .page-subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+        }
+
+        /* ==================== 课程网格 ==================== */
+        /* ==================== 课程列表 - 线性布局 ==================== */
+        .course-grid {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* ==================== 课程卡片 - 简化布局 ==================== */
+        .course-card {
+            background-color: var(--bg-primary);
+            border: 3px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--spacing-lg);
+            transition: border-color 0.2s;
+        }
+
+        .course-card:hover {
+            border-color: var(--accent-color);
+        }
+
+        .course-card:focus-within {
+            border-color: var(--accent-color);
+            outline: 3px solid var(--accent-color);
+            outline-offset: 2px;
+        }
+
+        .course-card.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .course-thumbnail {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            border-radius: 8px;
+            margin-bottom: var(--spacing-md);
+            position: relative;
+        }
+
+        .course-card:nth-child(2) .course-thumbnail {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .course-card:nth-child(3) .course-thumbnail {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .coming-soon-badge {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background-color: rgba(0,0,0,0.7);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .course-content {
+            /* 内容已经在卡片内部，不需要额外padding */
+        }
+
+        .course-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .course-description {
+            font-size: 16px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: var(--spacing-md);
+        }
+
+        /* 课程元信息 - 垂直线性布局 */
+        .course-meta {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xs);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 16px;
+            color: var(--text-secondary);
+        }
+
+        .course-button {
+            width: 100%;
+            padding: var(--spacing-md);
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            background-color: var(--accent-color);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-height: 48px;
+        }
+
+        .course-button:hover {
+            background-color: #1557b0;
+            transform: translateY(-2px);
+        }
+
+        .course-button:disabled {
+            background-color: var(--disabled-color);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .course-button.completed {
+            background-color: var(--success-color);
+            border: 3px solid var(--success-color);
+        }
+
+        .course-button.completed:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
+        }
+
+        /* ==================== 添加课程卡片（教师模式） - 线性布局 ==================== */
+        .add-course-card {
+            background-color: var(--bg-primary);
+            border: 3px dashed #999999;
+            border-radius: 12px;
+            padding: var(--spacing-lg);
+            transition: border-color 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .add-course-card:hover {
+            border-color: var(--accent-color);
+        }
+
+        .add-course-icon {
+            font-size: 64px;
+            color: #999999;
+            font-weight: 300;
+        }
+
+        .add-course-text {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--accent-color);
+            background: none;
+            border: 2px solid var(--accent-color);
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .add-course-text:hover {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .add-course-text:focus {
+            outline: 3px solid var(--accent-color);
+            outline-offset: 2px;
+        }
+            color: #666666;
+            font-weight: 600;
+        }
+
+        /* ==================== 响应式设计 ==================== */
+        @media (max-width: 768px) {
+            .course-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-title {
+                font-size: 24px;
+            }
+
+            .page-subtitle {
+                font-size: 16px;
+            }
+        }
+
+        /* ==================== 焦点可见性 ==================== */
+        *:focus-visible {
+            outline: 3px solid var(--accent-color);
+            outline-offset: 2px;
+        }
+
+        /* ==================== 听障模式样式覆盖（网格布局） ==================== */
+        body.hearing-mode .top-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--spacing-md) var(--spacing-lg);
+        }
+
+        body.hearing-mode .nav-title {
+            font-size: 28px;
+            margin-bottom: 0;
+            text-align: left;
+            flex-shrink: 0;
+        }
+
+        body.hearing-mode .user-mode-badge {
+            position: absolute;
+            top: var(--spacing-sm);
+            right: var(--spacing-lg);
+            margin-bottom: 0;
+        }
+
+        body.hearing-mode .nav-buttons {
+            display: flex;
+            flex-direction: row;
+            gap: var(--spacing-md);
+            margin: 0;
+            max-width: none;
+            margin-left: auto;
+            padding-right: 150px;
+        }
+
+        body.hearing-mode .nav-btn {
+            width: auto;
+            min-width: 140px;
+            padding: 12px 20px;
+            font-size: 16px;
+            min-height: 48px;
+        }
+
+        body.hearing-mode .nav-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* 课程网格 - 网格布局 */
+        body.hearing-mode .course-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: var(--spacing-lg);
+            max-width: 1200px;
+        }
+
+        /* 课程卡片 - 紧凑样式 */
+        body.hearing-mode .course-card {
+            display: flex;
+            flex-direction: column;
+            padding: var(--spacing-md);
+            cursor: pointer;
+        }
+
+        body.hearing-mode .course-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-color: var(--accent-color);
+        }
+
+        body.hearing-mode .course-thumbnail {
+            font-size: 48px;
+            text-align: center;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        body.hearing-mode .course-title {
+            font-size: 18px;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        body.hearing-mode .course-description {
+            font-size: 14px;
+            margin-bottom: var(--spacing-md);
+            flex-grow: 1;
+        }
+
+        body.hearing-mode .course-meta {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xs);
+            margin-bottom: var(--spacing-md);
+        }
+
+        body.hearing-mode .meta-item {
+            font-size: 13px;
+        }
+
+        body.hearing-mode .course-button {
+            padding: 10px 16px;
+            font-size: 15px;
+            min-height: 42px;
+        }
+
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 - 线性布局 -->
+    <nav class="top-nav" role="navigation" aria-label="主导航">
+        <div class="nav-title" role="heading" aria-level="1">无障碍AI学习平台</div>
+        <div class="user-mode-badge" id="userModeBadge" role="status">视障用户模式</div>
+
+        <!-- 导航按钮组 - 垂直排列 -->
+        <div class="nav-buttons" role="group" aria-label="导航按钮">
+            <button class="nav-btn" id="returnBtn" aria-label="返回首页">
+                ← 返回首页
+            </button>
+            <button class="nav-btn" id="homeworkBtn" aria-label="查看我的作业">
+                📝 查看我的作业
+            </button>
+            <button class="nav-btn" id="assignHomeworkBtn" aria-label="布置作业" style="display: none;">
+                📋 布置作业
+            </button>
+        </div>
+    </nav>
+
+    <!-- 主容器 -->
+    <div class="container">
+        <!-- 页面头部 -->
+        <header class="page-header">
+            <h1 class="page-title">选择您想学习的课程</h1>
+            <p class="page-subtitle">我们为您准备了多个AI学习课程，从基础到进阶</p>
+        </header>
+
+        <!-- 课程列表 -->
+        <div class="course-grid" role="list" aria-label="可选课程列表">
+            <!-- 课程1：AI助手基础入门 -->
+            <article class="course-card" id="course1" data-course-id="1" role="listitem">
+                <div class="course-thumbnail" aria-hidden="true">🤖</div>
+                <h2 class="course-title">课程1：AI助手基础入门</h2>
+                <p class="course-description">
+                    学习如何使用AI助手进行日常对话、提问和获取帮助。适合零基础用户。
+                </p>
+                <div class="course-meta" role="list" aria-label="课程信息">
+                    <div class="meta-item" role="listitem">
+                        <span aria-hidden="true">⏱️</span>
+                        <span>学习时长：约30分钟</span>
+                    </div>
+                    <div class="meta-item" role="listitem">
+                        <span aria-hidden="true">📚</span>
+                        <span>任务数量：5个任务</span>
+                    </div>
+                </div>
+                <button class="course-button" aria-label="开始学习AI助手基础入门课程">
+                    开始学习
+                </button>
+            </article>
+
+            <!-- 课程2：视频教学课程 -->
+            <article class="course-card" id="course2" data-course-id="2" role="listitem">
+                <div class="course-thumbnail" aria-hidden="true">🎬</div>
+                <h2 class="course-title">课程2：视频教学课程（带字幕）</h2>
+                <p class="course-description">
+                    通过视频学习AI知识，配备完整的中文字幕，适合听障用户学习。
+                </p>
+                <div class="course-meta" role="list" aria-label="课程信息">
+                    <div class="meta-item" role="listitem">
+                        <span aria-hidden="true">⏱️</span>
+                        <span>学习时长：约20分钟</span>
+                    </div>
+                    <div class="meta-item" role="listitem">
+                        <span aria-hidden="true">📚</span>
+                        <span>课程类型：视频+字幕</span>
+                    </div>
+                </div>
+                <button class="course-button" aria-label="开始学习视频教学课程">
+                    开始学习
+                </button>
+            </article>
+
+            <!-- 课程3：AI图像生成 -->
+            <article class="course-card disabled" id="course3" data-course-id="3" role="listitem">
+                <div class="course-thumbnail" aria-hidden="true">
+                    🎨
+                    <span class="coming-soon-badge">即将推出</span>
+                </div>
+                <h2 class="course-title">课程3：AI图像生成</h2>
+                <p class="course-description">
+                    学习如何使用AI生成图像，包括描述图像、调整风格等技巧。
+                </p>
+                <div class="course-meta" role="list" aria-label="课程信息">
+                    <div class="meta-item" role="listitem">
+                        <span aria-hidden="true">⏱️</span>
+                        <span>学习时长：约60分钟</span>
+                    </div>
+                    <div class="meta-item" role="listitem">
+                        <span aria-hidden="true">📚</span>
+                        <span>任务数量：8个任务</span>
+                    </div>
+                </div>
+                <button class="course-button" disabled aria-label="AI图像生成课程即将推出，暂时无法学习">
+                    即将推出
+                </button>
+            </article>
+
+            <!-- 添加课程卡片（仅教师模式显示） -->
+            <article class="add-course-card" id="addCourseCard" style="display: none;" role="listitem">
+                <div class="add-course-icon" aria-hidden="true">+</div>
+                <button class="add-course-text" aria-label="创建新课程">
+                    添加新课程
+                </button>
+            </article>
+        </div>
+    </div>
+
+    <script>
+        // ==================== 用户模式检测与初始化 ====================
+        // 获取URL参数
+        const urlParams = new URLSearchParams(window.location.search);
+        let userMode = urlParams.get('mode');
+
+        // 如果URL参数不存在，则从localStorage读取
+        if (!userMode || userMode === '') {
+            userMode = localStorage.getItem('userMode') || 'visual';
+        }
+
+        // 调试信息（可以在浏览器控制台查看）
+        console.log('=== 课程选择页面 - 用户模式检测 ===');
+        console.log('URL参数:', window.location.search);
+        console.log('检测到的用户模式:', userMode);
+
+        // 保存用户模式到localStorage
+        localStorage.setItem('userMode', userMode);
+
+        // 更新用户模式显示
+        const userModeBadge = document.getElementById('userModeBadge');
+        const assignHomeworkBtn = document.getElementById('assignHomeworkBtn');
+        const addCourseCard = document.getElementById('addCourseCard');
+        const homeworkBtn = document.getElementById('homeworkBtn');
+
+        // 根据用户模式配置界面
+        if (userMode === 'teacher') {
+            console.log('配置教师模式界面...');
+            userModeBadge.textContent = '教师模式';
+            // 显示教师专用按钮和卡片
+            if (assignHomeworkBtn) assignHomeworkBtn.style.display = 'block';
+            if (addCourseCard) addCourseCard.style.display = 'flex';
+            // 隐藏学生作业按钮
+            if (homeworkBtn) homeworkBtn.style.display = 'none';
+        } else if (userMode === 'hearing') {
+            console.log('配置听障用户模式界面...');
+            userModeBadge.textContent = '听障用户模式';
+            document.body.classList.add('hearing-mode');
+            // 隐藏教师专用按钮和卡片
+            if (assignHomeworkBtn) assignHomeworkBtn.style.display = 'none';
+            if (addCourseCard) addCourseCard.style.display = 'none';
+            // 显示学生作业按钮
+            if (homeworkBtn) homeworkBtn.style.display = 'block';
+        } else {
+            console.log('配置视障用户模式界面...');
+            userModeBadge.textContent = '视障用户模式';
+            document.body.classList.add('visual-mode');
+            // 隐藏教师专用按钮和卡片
+            if (assignHomeworkBtn) assignHomeworkBtn.style.display = 'none';
+            if (addCourseCard) addCourseCard.style.display = 'none';
+            // 显示学生作业按钮
+            if (homeworkBtn) homeworkBtn.style.display = 'block';
+        }
+
+        // ==================== 动态加载课程 ====================
+        async function loadCoursesFromAPI() {
+            try {
+                const response = await fetch('http://localhost:3000/api/courses');
+                const result = await response.json();
+
+                if (result.success && result.courses) {
+                    // 获取课程网格容器
+                    const courseGrid = document.querySelector('.course-grid');
+
+                    // 渲染从API获取的课程（跳过第一个示例课程，因为它已经硬编码了）
+                    result.courses.slice(1).forEach(course => {
+                        renderCourseCard(course, courseGrid);
+                    });
+                }
+            } catch (error) {
+                console.error('加载课程失败:', error);
+                // 如果后端未启动，静默失败，使用硬编码的课程
+            }
+        }
+
+        // 渲染课程卡片
+        function renderCourseCard(course, container) {
+            const article = document.createElement('article');
+            article.className = 'course-card';
+            article.setAttribute('data-course-id', course.id);
+            article.setAttribute('role', 'listitem');
+
+            const taskCount = course.tasks ? course.tasks.length : 0;
+
+            // 检查课程是否已完成
+            const completedCourses = JSON.parse(localStorage.getItem('completedCourses') || '[]');
+            const isCompleted = completedCourses.includes(course.id);
+
+            const buttonClass = isCompleted ? 'course-button completed' : 'course-button';
+            const buttonText = isCompleted ? '✓ 已完成' : '开始学习';
+            const buttonLabel = isCompleted ? `${course.title}课程已完成，点击重新学习` : `开始学习${course.title}课程`;
+
+            article.innerHTML = `
+                <div class="course-thumbnail" aria-hidden="true">🎓</div>
+                <h2 class="course-title">课程：${course.title}</h2>
+                <p class="course-description">
+                    ${course.description}
+                </p>
+                <div class="course-meta" role="list" aria-label="课程信息">
+                    <div class="meta-item" role="listitem">
+                        <span aria-hidden="true">📚</span>
+                        <span>任务数量：${taskCount}个任务</span>
+                    </div>
+                </div>
+                <button class="${buttonClass}" aria-label="${buttonLabel}">
+                    ${buttonText}
+                </button>
+            `;
+
+            // 添加点击事件
+            article.addEventListener('click', function() {
+                if (userMode === 'teacher') {
+                    window.location.href = `teacher_dashboard.html?action=edit&courseId=${course.id}`;
+                } else {
+                    // 学生模式：跳转到统一的课程学习页面
+                    window.location.href = `course_learning.html?courseId=${course.id}&mode=${userMode}`;
+                }
+            });
+
+            // 插入到"添加课程"卡片之前
+            const addCourseCard = document.getElementById('addCourseCard');
+            if (addCourseCard) {
+                container.insertBefore(article, addCourseCard);
+            } else {
+                container.appendChild(article);
+            }
+        }
+
+        // 更新静态课程卡片的完成状态
+        function updateStaticCourseCards() {
+            const completedCourses = JSON.parse(localStorage.getItem('completedCourses') || '[]');
+
+            // 更新课程1
+            if (completedCourses.includes('course_001')) {
+                const course1Btn = document.querySelector('#course1 .course-button');
+                if (course1Btn) {
+                    course1Btn.classList.add('completed');
+                    course1Btn.textContent = '✓ 已完成';
+                    course1Btn.setAttribute('aria-label', 'AI助手基础入门课程已完成，点击重新学习');
+                }
+            }
+
+            // 更新课程2
+            if (completedCourses.includes('course_002')) {
+                const course2Btn = document.querySelector('#course2 .course-button');
+                if (course2Btn) {
+                    course2Btn.classList.add('completed');
+                    course2Btn.textContent = '✓ 已完成';
+                    course2Btn.setAttribute('aria-label', '视频教学课程已完成，点击重新学习');
+                }
+            }
+
+            // 更新课程3
+            if (completedCourses.includes('course_003')) {
+                const course3Btn = document.querySelector('#course3 .course-button');
+                if (course3Btn) {
+                    course3Btn.classList.add('completed');
+                    course3Btn.textContent = '✓ 已完成';
+                    course3Btn.setAttribute('aria-label', '高级AI应用课程已完成，点击重新学习');
+                }
+            }
+        }
+
+        // 页面加载时获取课程
+        loadCoursesFromAPI();
+
+        // 更新静态课程卡片的完成状态
+        updateStaticCourseCards();
+
+        // 课程1点击事件
+        document.getElementById('course1').addEventListener('click', function() {
+            if (userMode === 'teacher') {
+                // 教师模式：跳转到课程编辑页面
+                window.location.href = 'teacher_dashboard.html?action=edit&courseId=course_001';
+            } else {
+                // 学生模式：跳转到统一的课程学习页面
+                window.location.href = `course_learning.html?courseId=course_001&mode=${userMode}`;
+            }
+        });
+
+        // 课程2点击事件（视频教学课程）
+        document.getElementById('course2').addEventListener('click', function() {
+            if (userMode === 'teacher') {
+                // 教师模式：跳转到课程编辑页面
+                window.location.href = 'teacher_dashboard.html?action=edit&courseId=course_002';
+            } else {
+                // 学生模式：跳转到统一的课程学习页面
+                window.location.href = `course_learning.html?courseId=course_002&mode=${userMode}`;
+            }
+        });
+
+        // 禁用的课程卡片点击提示
+        document.querySelectorAll('.course-card.disabled').forEach(card => {
+            card.addEventListener('click', function() {
+                if (userMode === 'teacher') {
+                    // 教师模式：可以编辑即将推出的课程
+                    const courseId = this.getAttribute('data-course-id');
+                    window.location.href = `teacher_dashboard.html?action=edit&courseId=${courseId}`;
+                } else {
+                    alert('该课程即将推出，敬请期待！');
+                }
+            });
+        });
+
+        // 添加课程卡片点击事件（教师模式）
+        if (addCourseCard) {
+            addCourseCard.addEventListener('click', function() {
+                window.location.href = 'teacher_dashboard.html?action=create';
+            });
+        }
+
+        // 布置作业按钮点击事件（教师模式）
+        if (assignHomeworkBtn) {
+            assignHomeworkBtn.addEventListener('click', function() {
+                window.location.href = 'teacher_dashboard.html?action=homework';
+            });
+        }
+
+
+
+
+
+        // ==================== 返回按钮功能 ====================
+        const returnBtn = document.getElementById('returnBtn');
+        if (returnBtn) {
+            returnBtn.addEventListener('click', () => {
+                window.location.href = 'qianduan.html';
+            });
+        }
+
+        // ==================== 作业按钮功能 ====================
+        if (homeworkBtn) {
+            homeworkBtn.addEventListener('click', () => {
+                window.location.href = `homework_submission.html?mode=${userMode}`;
+            });
+        }
+    </script>
+</body>
+</html>

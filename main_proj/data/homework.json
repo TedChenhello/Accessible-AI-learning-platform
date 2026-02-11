@@ -1,0 +1,38 @@
+{
+  "homework": [
+    {
+      "id": "hw_001",
+      "title": "使用AI生成一张风景图片",
+      "description": "使用AI图像生成工具创建一张风景图片，要求包含山、水、天空等元素。",
+      "courseId": "course_001",
+      "deadline": "2024-12-31T23:59:59Z",
+      "aiToolLinks": [
+        {
+          "name": "Midjourney",
+          "url": "https://www.midjourney.com"
+        }
+      ],
+      "tasks": [
+        {
+          "taskId": "hw_task_001",
+          "taskType": "ai_image_generation",
+          "taskTitle": "生成风景图片",
+          "taskDescription": "使用Midjourney生成一张包含山、水、天空的风景图片",
+          "taskParams": {
+            "aiPlatform": "Midjourney",
+            "promptTemplate": "a beautiful landscape with mountains, water, and sky, realistic, 4k",
+            "requirements": [
+              "必须包含山",
+              "必须包含水",
+              "必须包含天空"
+            ]
+          }
+        }
+      ],
+      "createdAt": "2024-01-15T10:00:00Z",
+      "createdBy": "teacher_001",
+      "status": "active"
+    }
+  ],
+  "submissions": []
+}

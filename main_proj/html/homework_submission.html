@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的作业 - 无障碍AI学习平台</title>
+    
+    <style>
+        /* ==================== 基础样式 ==================== */
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f5f5f5;
+            --text-primary: #212121;
+            --text-secondary: #666666;
+            --accent-color: #1a73e8;
+            --success-color: #34a853;
+            --warning-color: #fbbc04;
+            --error-color: #ea4335;
+            --border-color: #e0e0e0;
+            
+            --spacing-xs: 8px;
+            --spacing-sm: 12px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+                         "Microsoft YaHei", sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background-color: var(--bg-secondary);
+            min-height: 100vh;
+        }
+        
+        /* ==================== 顶部导航栏 ==================== */
+        .top-nav {
+            background-color: var(--accent-color);
+            color: white;
+            padding: var(--spacing-md) var(--spacing-lg);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .nav-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .nav-btn {
+            background-color: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .nav-btn:hover {
+            background-color: rgba(255,255,255,0.3);
+        }
+        
+        /* ==================== 主容器 ==================== */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: var(--spacing-xl) var(--spacing-md);
+        }
+        
+        /* ==================== 卡片样式 ==================== */
+        .card {
+            background-color: var(--bg-primary);
+            border-radius: 12px;
+            padding: var(--spacing-lg);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        /* ==================== 表单样式 ==================== */
+        .form-group {
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .form-input,
+        .form-textarea {
+            width: 100%;
+            padding: var(--spacing-sm);
+            font-size: 14px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            transition: border-color 0.2s;
+        }
+        
+        .form-input:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+        
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        /* ==================== 按钮样式 ==================== */
+        .btn {
+            padding: var(--spacing-sm) var(--spacing-lg);
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-height: 40px;
+        }
+        
+        .btn-primary {
+            background-color: var(--accent-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #1557b0;
+        }
+        
+        /* ==================== 文件上传样式 ==================== */
+        .file-upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: var(--spacing-lg);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .file-upload-area:hover {
+            border-color: var(--accent-color);
+            background-color: rgba(26, 115, 232, 0.05);
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .file-preview {
+            margin-top: var(--spacing-md);
+            padding: var(--spacing-sm);
+            background-color: var(--bg-secondary);
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        /* ==================== 作业列表样式 ==================== */
+        .homework-list {
+            list-style: none;
+        }
+        
+        .homework-item {
+            background-color: var(--bg-primary);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .homework-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .homework-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .homework-meta {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .homework-link {
+            display: inline-block;
+            margin-top: var(--spacing-sm);
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+        
+        .homework-link:hover {
+            text-decoration: underline;
+        }
+        
+        
+        .notification {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background-color: var(--success-color);
+            color: white;
+            padding: var(--spacing-md);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 1000;
+            opacity: 1;
+            transition: opacity 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <nav class="top-nav">
+        <div class="nav-title">📝 我的作业</div>
+        <button class="nav-btn" id="returnBtn" aria-label="返回课程选择页面">
+            ← 返回
+        </button>
+    </nav>
+    
+    <!-- 主容器 -->
+    <div class="container">
+        <!-- 作业列表 -->
+        <div class="card">
+            <h2 class="card-title">📋 待完成作业</h2>
+            <ul class="homework-list" id="homeworkList">
+                <!-- 示例作业 -->
+                <li class="homework-item">
+                    <h3 class="homework-title">作业1：使用AI生成一张风景图片</h3>
+                    <p class="homework-desc">使用AI图像生成工具创建一张风景图片，要求包含山、水、天空等元素。</p>
+                    <p class="homework-meta">截止日期：2024-12-31 | 状态：未提交</p>
+                    <a href="https://www.midjourney.com" class="homework-link" target="_blank" rel="noopener">
+                        🔗 前往AI工具
+                    </a>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- 作业提交表单 -->
+        <div class="card">
+            <h2 class="card-title">📤 提交作业</h2>
+            <form id="submissionForm">
+                <div class="form-group">
+                    <label class="form-label" for="homeworkSelect">选择作业 *</label>
+                    <select id="homeworkSelect" class="form-input" required>
+                        <option value="">请选择要提交的作业</option>
+                        <option value="1">作业1：使用AI生成一张风景图片</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="submissionNote">作业说明</label>
+                    <textarea id="submissionNote" class="form-textarea" 
+                              placeholder="简要说明您的作业内容、使用的AI工具、创作过程等..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">上传作业文件 *</label>
+                    <div class="file-upload-area" onclick="document.getElementById('fileInput').click()">
+                        <div style="font-size: 48px; margin-bottom: 8px;">📁</div>
+                        <div>点击上传文件（支持图片、视频、HTML等格式）</div>
+                    </div>
+                    <input type="file" id="fileInput" class="file-input" 
+                           accept="image/*,video/*,.html,.htm" 
+                           onchange="handleFileUpload(this)" required>
+                    <div id="filePreview" class="file-preview" style="display:none;"></div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">提交作业</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // ==================== 用户模式检测 ====================
+        const urlParams = new URLSearchParams(window.location.search);
+        const userMode = urlParams.get('mode') || localStorage.getItem('userMode') || 'visual';
+        localStorage.setItem('userMode', userMode);
+        
+        // ==================== 返回按钮功能 ====================
+        const returnBtn = document.getElementById('returnBtn');
+        returnBtn.addEventListener('click', () => {
+            window.location.href = `course_selection.html?mode=${userMode}`;
+        });
+
+        // ==================== 动态加载作业 ====================
+        async function loadHomeworkFromAPI() {
+            try {
+                const response = await fetch('http://localhost:3000/api/homework');
+                const result = await response.json();
+
+                if (result.success && result.homework) {
+                    const homeworkList = document.getElementById('homeworkList');
+                    const homeworkSelect = document.getElementById('homeworkSelect');
+
+                    // 清空现有内容
+                    homeworkList.innerHTML = '';
+                    homeworkSelect.innerHTML = '<option value="">请选择要提交的作业</option>';
+
+                    // 渲染作业列表
+                    result.homework.forEach(hw => {
+                        renderHomeworkItem(hw, homeworkList);
+                        addHomeworkOption(hw, homeworkSelect);
+                    });
+                }
+            } catch (error) {
+                console.error('加载作业失败:', error);
+                // 如果后端未启动，保留示例作业
+            }
+        }
+
+        // 渲染作业项
+        function renderHomeworkItem(homework, container) {
+            const li = document.createElement('li');
+            li.className = 'homework-item';
+
+            const deadline = homework.deadline ? new Date(homework.deadline).toLocaleDateString('zh-CN') : '无截止日期';
+            const aiToolLink = homework.aiToolLinks && homework.aiToolLinks.length > 0
+                ? homework.aiToolLinks[0].url
+                : '#';
+            const aiToolName = homework.aiToolLinks && homework.aiToolLinks.length > 0
+                ? homework.aiToolLinks[0].name
+                : 'AI工具';
+
+            li.innerHTML = `
+                <h3 class="homework-title">${homework.title}</h3>
+                <p class="homework-desc">${homework.description}</p>
+                <p class="homework-meta">截止日期：${deadline} | 状态：未提交</p>
+                ${aiToolLink !== '#' ? `<a href="${aiToolLink}" class="homework-link" target="_blank" rel="noopener">
+                    🔗 前往${aiToolName}
+                </a>` : ''}
+            `;
+
+            container.appendChild(li);
+        }
+
+        // 添加作业选项
+        function addHomeworkOption(homework, select) {
+            const option = document.createElement('option');
+            option.value = homework.id;
+            option.textContent = homework.title;
+            select.appendChild(option);
+        }
+
+        // 页面加载时获取作业
+        loadHomeworkFromAPI();
+
+        // ==================== 文件上传处理 ====================
+        function handleFileUpload(input) {
+            const file = input.files[0];
+            const preview = document.getElementById('filePreview');
+            
+            if (file) {
+                preview.style.display = 'block';
+                preview.innerHTML = `
+                    <strong>已选择文件：</strong> ${file.name}
+                    <br><strong>文件大小：</strong> ${(file.size / 1024 / 1024).toFixed(2)} MB
+                `;
+            }
+        }
+        
+        // ==================== 通知功能 ====================
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            notification.setAttribute('role', 'alert');
+            notification.setAttribute('aria-live', 'assertive');
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+        
+        // ==================== 表单提交 ====================
+        document.getElementById('submissionForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const homeworkSelect = document.getElementById('homeworkSelect').value;
+            const note = document.getElementById('submissionNote').value;
+            const file = document.getElementById('fileInput').files[0];
+            
+            if (!homeworkSelect || !file) {
+                alert('请选择作业并上传文件！');
+                return;
+            }
+            
+            // 这里暂时只是显示提示，实际应该发送到后端
+            const message = '作业提交成功！\n\n注意：当前为演示模式，数据未保存到服务器。';
+            alert(message);
+            showNotification('作业提交成功！');
+            
+            // 重置表单
+            e.target.reset();
+            document.getElementById('filePreview').style.display = 'none';
+        });
+        
+    </script>
+</body>
+</html>

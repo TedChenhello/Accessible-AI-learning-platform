@@ -1,0 +1,212 @@
+{
+  "courses": [
+    {
+      "id": "course_001",
+      "title": "AI对话基础教程",
+      "description": "学习如何与AI进行有效对话，掌握基本的提示词技巧",
+      "content": "本课程将教您如何与AI助手进行对话，包括如何提出清晰的问题、如何优化提示词等内容。",
+      "videoUrl": "",
+      "aiToolLinks": [
+        {
+          "name": "ChatGPT",
+          "url": "https://chat.openai.com"
+        },
+        {
+          "name": "DeepSeek",
+          "url": "https://chat.deepseek.com"
+        }
+      ],
+      "tasks": [
+        {
+          "taskId": "task_001",
+          "taskType": "ai_chat",
+          "taskTitle": "与AI进行自我介绍",
+          "taskDescription": "请打开DeepSeek，向AI介绍你自己，包括你的姓名、兴趣爱好等信息。",
+          "taskParams": {
+            "aiPlatform": "DeepSeek",
+            "promptTemplate": "你好，我是[你的名字]，我的兴趣爱好是[你的爱好]...",
+            "expectedLength": "50-100字"
+          },
+          "order": 1
+        },
+        {
+          "taskId": "task_002",
+          "taskType": "ai_chat",
+          "taskTitle": "让AI帮你写一首诗",
+          "taskDescription": "请让AI根据你提供的主题创作一首诗。",
+          "taskParams": {
+            "aiPlatform": "DeepSeek",
+            "promptTemplate": "请帮我写一首关于[主题]的诗",
+            "expectedLength": "4-8行"
+          },
+          "order": 2
+        }
+      ],
+      "createdAt": "2024-01-15T10:00:00Z",
+      "createdBy": "teacher_001",
+      "status": "active"
+    },
+    {
+      "id": "course_002",
+      "title": "🎬 AI基础知识视频教学",
+      "description": "通过视频学习如何使用各种AI工具",
+      "content": "本课程通过视频演示的方式，教您如何使用主流的AI工具，包括ChatGPT、Midjourney等。",
+      "videoUrl": "https://archive.org/download/gov.archives.arc.1257628/gov.archives.arc.1257628_512kb.mp4",
+      "subtitleUrl": "data/subtitles/course_002_subtitles.vtt",
+      "aiToolLinks": [
+        {
+          "name": "ChatGPT",
+          "url": "https://chat.openai.com"
+        }
+      ],
+      "tasks": [
+        {
+          "taskId": "task_video_001",
+          "taskType": "video_watch",
+          "taskTitle": "观看教学视频",
+          "taskDescription": "请完整观看AI工具使用教程视频，了解基本操作流程。",
+          "taskParams": {
+            "aiPlatform": "ChatGPT",
+            "promptTemplate": "",
+            "expectedLength": ""
+          },
+          "order": 1
+        },
+        {
+          "taskId": "task_video_002",
+          "taskType": "ai_chat",
+          "taskTitle": "实践视频中的操作",
+          "taskDescription": "根据视频中学到的内容，尝试使用ChatGPT完成一个简单的对话任务。",
+          "taskParams": {
+            "aiPlatform": "ChatGPT",
+            "promptTemplate": "请帮我总结一下今天学到的AI工具使用技巧",
+            "expectedLength": "100-200字"
+          },
+          "order": 2
+        }
+      ],
+      "createdAt": "2024-01-15T10:00:00Z",
+      "createdBy": "teacher_001",
+      "status": "active"
+    },
+    {
+      "id": "course_1770702152970_nyl0pz96e",
+      "title": "aa",
+      "description": "hhh",
+      "content": "aminos",
+      "videoUrl": "",
+      "aiToolLinks": [
+        {
+          "name": "AI工具",
+          "url": "https://deepseek.com"
+        }
+      ],
+      "tasks": [
+        {
+          "taskId": "task_1770702104477",
+          "taskType": "ai_chat",
+          "taskTitle": "杀死Deepseek",
+          "taskDescription": "把他杀了",
+          "taskParams": {
+            "aiPlatform": "DeepSeek",
+            "promptTemplate": "我要杀了你",
+            "expectedLength": ""
+          },
+          "order": 1
+        }
+      ],
+      "createdAt": "2026-02-10T05:42:32.970Z",
+      "createdBy": "teacher_001",
+      "status": "active"
+    },
+    {
+      "id": "course_1770710850900_eklnm2ay6",
+      "title": "AI",
+      "description": "fffs",
+      "content": "",
+      "videoUrl": "meeting_01.mp4",
+      "aiToolLinks": [
+        {
+          "name": "AI工具",
+          "url": "https://deepseek.com"
+        }
+      ],
+      "tasks": [
+        {
+          "taskId": "task_1770710831920",
+          "taskType": "ai_chat",
+          "taskTitle": "jkjkj",
+          "taskDescription": "",
+          "taskParams": {
+            "aiPlatform": "DeepSeek",
+            "promptTemplate": "aefaerfgsgvrfesdgvffgvesd.i",
+            "expectedLength": ""
+          },
+          "order": 1
+        },
+        {
+          "taskId": "task_1770710839870",
+          "taskType": "ai_chat",
+          "taskTitle": "nnn,nmmberag sda asdf ",
+          "taskDescription": "",
+          "taskParams": {
+            "aiPlatform": "DeepSeek",
+            "promptTemplate": "klsadfavdfafgvsvasfgv;dsfjesftbgesrg",
+            "expectedLength": ""
+          },
+          "order": 2
+        }
+      ],
+      "createdAt": "2026-02-10T08:07:30.900Z",
+      "createdBy": "teacher_001",
+      "status": "active"
+    },
+    {
+      "id": "course_1770719377274_u1zllcbcw",
+      "title": "xcvxcvxzcvxzcv",
+      "description": "fffgfddsfg",
+      "content": "bbvbcvbcv",
+      "videoUrl": "",
+      "aiToolLinks": [
+        {
+          "name": "AI工具",
+          "url": "https://deepseek.com"
+        }
+      ],
+      "tasks": [
+        {
+          "taskId": "task_1770719357822",
+          "taskType": "ai_chat",
+          "taskTitle": "vxdxcvxcvxcv",
+          "taskDescription": "",
+          "taskParams": {
+            "aiPlatform": "DeepSeek",
+            "promptTemplate": "",
+            "expectedLength": ""
+          },
+          "order": 1
+        }
+      ],
+      "createdAt": "2026-02-10T10:29:37.275Z",
+      "createdBy": "teacher_001",
+      "status": "active"
+    },
+    {
+      "id": "course_1770778480780_7vh7ed5pd",
+      "title": "AI",
+      "description": "，，，，",
+      "content": "hehehaha",
+      "videoUrl": "meeting_01.mp4",
+      "aiToolLinks": [
+        {
+          "name": "AI工具",
+          "url": "https://chat.deepseek.com"
+        }
+      ],
+      "tasks": [],
+      "createdAt": "2026-02-11T02:54:40.780Z",
+      "createdBy": "teacher_001",
+      "status": "active"
+    }
+  ]
+}

@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>视频教学课程 - 无障碍AI学习平台</title>
+
+    <style>
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f5f5f5;
+            --text-primary: #212121;
+            --text-secondary: #666666;
+            --accent-color: #1a73e8;
+            --success-color: #34a853;
+            --border-color: #e0e0e0;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background-color: var(--bg-secondary);
+            min-height: 100vh;
+        }
+
+        /* 顶部导航栏 */
+        .top-nav {
+            background-color: var(--accent-color);
+            color: white;
+            padding: var(--spacing-md) var(--spacing-lg);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .nav-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .return-btn {
+            background-color: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .return-btn:hover {
+            background-color: rgba(255,255,255,0.3);
+        }
+
+        /* 主容器 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--spacing-xl) var(--spacing-md);
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .page-subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+        }
+
+        /* 视频播放器区域 */
+        .video-section {
+            background-color: var(--bg-primary);
+            border-radius: 16px;
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: #000;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        video {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* 字幕样式 */
+        video::cue {
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            font-size: 24px;
+            font-weight: 600;
+            line-height: 1.4;
+            padding: 8px 16px;
+        }
+
+        /* 字幕控制面板 */
+        .subtitle-controls {
+            margin-top: var(--spacing-lg);
+            padding: var(--spacing-lg);
+            background-color: var(--bg-secondary);
+            border-radius: 12px;
+        }
+
+        .controls-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-md);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-group {
+            margin-bottom: var(--spacing-md);
+        }
+
+        .control-label {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .control-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            background-color: var(--accent-color);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .control-btn:hover {
+            background-color: #1557b0;
+            transform: translateY(-2px);
+        }
+
+        .control-btn.active {
+            background-color: var(--success-color);
+        }
+
+        /* 字幕大小调节 */
+        .size-slider {
+            width: 100%;
+            max-width: 300px;
+            height: 8px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: var(--border-color);
+            outline: none;
+            border-radius: 4px;
+        }
+
+        .size-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            background: var(--accent-color);
+            cursor: pointer;
+            border-radius: 50%;
+        }
+
+        .size-slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            background: var(--accent-color);
+            cursor: pointer;
+            border-radius: 50%;
+            border: none;
+        }
+
+        .size-value {
+            display: inline-block;
+            margin-left: 12px;
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+
+        /* 视频信息 */
+        .video-info {
+            margin-top: var(--spacing-lg);
+            padding: var(--spacing-lg);
+            background-color: var(--bg-primary);
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .info-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .info-content {
+            font-size: 16px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 24px;
+            }
+
+            .control-buttons {
+                flex-direction: column;
+            }
+
+            .control-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <nav class="top-nav">
+        <button class="return-btn" id="returnBtn">← 返回课程列表</button>
+        <div class="nav-title">视频教学课程</div>
+        <div style="width: 100px;"></div>
+    </nav>
+
+    <!-- 主容器 -->
+    <div class="container">
+        <!-- 页面头部 -->
+        <header class="page-header">
+            <h1 class="page-title">🎬 AI基础知识视频教学</h1>
+            <p class="page-subtitle">配备完整中文字幕，支持字幕开关和大小调节</p>
+        </header>
+
+        <!-- 视频播放器区域 -->
+        <section class="video-section">
+            <div class="video-container">
+                <video id="mainVideo" controls crossorigin="anonymous">
+                    <source src="https://archive.org/download/gov.archives.arc.1257628/gov.archives.arc.1257628_512kb.mp4" type="video/mp4">
+                    <track id="subtitleTrack" label="中文字幕" kind="subtitles" srclang="zh" src="course2_subtitles.vtt" default>
+                    您的浏览器不支持视频播放。
+                </video>
+            </div>
+
+            <!-- 字幕控制面板 -->
+            <div class="subtitle-controls">
+                <div class="controls-title">📝 字幕控制</div>
+
+                <div class="control-group">
+                    <label class="control-label">字幕开关</label>
+                    <div class="control-buttons">
+                        <button class="control-btn active" id="subtitleOnBtn">显示字幕</button>
+                        <button class="control-btn" id="subtitleOffBtn">隐藏字幕</button>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">字幕大小</label>
+                    <input type="range" class="size-slider" id="subtitleSizeSlider" min="16" max="40" value="24" step="2">
+                    <span class="size-value" id="sizeValue">24px</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 视频信息 -->
+        <section class="video-info">
+            <h2 class="info-title">📖 课程说明</h2>
+            <div class="info-content">
+                <p><strong>课程内容：</strong>本视频介绍了AI的基础知识，包括什么是人工智能、AI的应用场景、以及如何使用AI工具。</p>
+                <br>
+                <p><strong>字幕功能：</strong>本课程配备了完整的中文字幕，您可以通过上方的控制面板开关字幕或调节字幕大小。</p>
+                <br>
+                <p><strong>学习建议：</strong>建议开启字幕学习，可以更好地理解视频内容。如果您是听障用户，字幕将帮助您完整理解课程内容。</p>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // 获取用户模式
+        const urlParams = new URLSearchParams(window.location.search);
+        const userMode = urlParams.get('mode') || localStorage.getItem('userMode') || 'visual';
+
+        // 获取DOM元素
+        const video = document.getElementById('mainVideo');
+        const subtitleTrack = document.getElementById('subtitleTrack');
+        const subtitleOnBtn = document.getElementById('subtitleOnBtn');
+        const subtitleOffBtn = document.getElementById('subtitleOffBtn');
+        const subtitleSizeSlider = document.getElementById('subtitleSizeSlider');
+        const sizeValue = document.getElementById('sizeValue');
+        const returnBtn = document.getElementById('returnBtn');
+
+        // 字幕开关功能
+        subtitleOnBtn.addEventListener('click', () => {
+            if (video.textTracks.length > 0) {
+                video.textTracks[0].mode = 'showing';
+                subtitleOnBtn.classList.add('active');
+                subtitleOffBtn.classList.remove('active');
+            }
+        });
+
+        subtitleOffBtn.addEventListener('click', () => {
+            if (video.textTracks.length > 0) {
+                video.textTracks[0].mode = 'hidden';
+                subtitleOffBtn.classList.add('active');
+                subtitleOnBtn.classList.remove('active');
+            }
+        });
+
+        // 字幕大小调节
+        subtitleSizeSlider.addEventListener('input', (e) => {
+            const size = e.target.value;
+            sizeValue.textContent = size + 'px';
+
+            // 动态更新字幕样式
+            const style = document.createElement('style');
+            style.id = 'subtitle-size-style';
+            const existingStyle = document.getElementById('subtitle-size-style');
+            if (existingStyle) {
+                existingStyle.remove();
+            }
+            style.textContent = `
+                video::cue {
+                    font-size: ${size}px !important;
+                }
+            `;
+            document.head.appendChild(style);
+        });
+
+        // 返回按钮
+        returnBtn.addEventListener('click', () => {
+            window.location.href = `course_selection.html?mode=${userMode}`;
+        });
+
+        // 页面加载时确保字幕默认显示
+        window.addEventListener('load', () => {
+            if (video.textTracks.length > 0) {
+                video.textTracks[0].mode = 'showing';
+            }
+        });
+    </script>
+</body>
+</html>

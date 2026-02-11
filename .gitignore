@@ -1,0 +1,4 @@
+main_proj/.env
+main_proj/node_modules/
+node_modules/
+.env

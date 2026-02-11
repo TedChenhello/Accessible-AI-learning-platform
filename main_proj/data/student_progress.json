@@ -1,0 +1,14 @@
+{
+  "progress": [
+    {
+      "studentId": "student_001",
+      "courseId": "course_001",
+      "taskIndex": 0,
+      "startTime": "2026-02-11T05:23:53.663Z",
+      "lastActivity": "2026-02-11T05:29:49.458Z",
+      "visitCount": 5,
+      "completed": false,
+      "completedAt": null
+    }
+  ]
+}

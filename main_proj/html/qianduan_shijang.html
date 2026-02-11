@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <meta name="description" content="无障碍AI学习平台 - 视障用户专用版">
+    <title>无障碍AI学习平台 - 视障用户版</title>
+
+    <!-- PWA支持 -->
+    <meta name="theme-color" content="#ff6b6b">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="manifest" href="manifest.json">
+
+    <style>
+        /* ==================== 基础样式 ==================== */
+        :root {
+            /* 高对比度配色 - 适合视障用户 */
+            --bg-primary: #000000;
+            --bg-secondary: #1a1a1a;
+            --text-primary: #ffffff;
+            --text-secondary: #cccccc;
+            --accent-color: #ff6b6b;
+            --success-color: #66ff66;
+            --error-color: #ff6666;
+            --border-color: #444444;
+
+            /* 字体大小 - 视障用户使用放大字体 */
+            --font-size-base: 16px;
+            --font-scale: 1.8;
+
+            --spacing-xs: 8px;
+            --spacing-sm: 12px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+                         "Microsoft YaHei", sans-serif;
+            font-size: calc(var(--font-size-base) * var(--font-scale));
+            line-height: 1.8;
+            color: var(--text-primary);
+            background-color: var(--bg-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ==================== 顶部工具栏 ==================== */
+        .top-toolbar {
+            background-color: var(--accent-color);
+            color: white;
+            padding: var(--spacing-lg);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+        }
+
+        .toolbar-title {
+            font-size: calc(20px * var(--font-scale));
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .toolbar-badge {
+            background-color: rgba(255,255,255,0.3);
+            padding: var(--spacing-sm) var(--spacing-lg);
+            border-radius: 20px;
+            font-size: calc(16px * var(--font-scale));
+            font-weight: 600;
+        }
+
+        .toolbar-return-btn {
+            background-color: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+            padding: var(--spacing-sm) var(--spacing-lg);
+            border-radius: 8px;
+            font-size: calc(16px * var(--font-scale));
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-height: 48px;
+        }
+
+        .toolbar-return-btn:hover {
+            background-color: rgba(255,255,255,0.4);
+            transform: scale(1.05);
+        }
+
+
+        /* ==================== 主容器 ==================== */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: var(--spacing-lg);
+            flex: 1;
+        }
+
+        /* ==================== 任务卡片 ==================== */
+        .task-section {
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .task-card {
+            background-color: var(--bg-secondary);
+            border: 4px solid var(--border-color);
+            border-radius: 16px;
+            padding: var(--spacing-xl);
+            margin-bottom: var(--spacing-lg);
+            transition: all 0.3s;
+        }
+
+        .task-card.active {
+            border-color: var(--accent-color);
+            box-shadow: 0 6px 16px rgba(255, 107, 107, 0.4);
+        }
+
+        .task-card.completed {
+            border-color: var(--success-color);
+            opacity: 0.7;
+        }
+
+        .task-header {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .task-number {
+            flex-shrink: 0;
+            width: 70px;
+            height: 70px;
+            background-color: var(--accent-color);
+            color: var(--bg-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: calc(28px * var(--font-scale));
+            font-weight: 700;
+            border: 4px solid var(--text-primary);
+        }
+
+        .task-card.completed .task-number {
+            background-color: var(--success-color);
+        }
+
+        .task-title {
+            flex: 1;
+            font-size: calc(24px * var(--font-scale));
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .task-content {
+            font-size: calc(20px * var(--font-scale));
+            color: var(--text-secondary);
+            line-height: 2;
+            margin-bottom: var(--spacing-lg);
+            padding: var(--spacing-lg);
+            background-color: var(--bg-primary);
+            border-radius: 12px;
+            border: 2px solid var(--border-color);
+        }
+
+        .task-actions {
+            display: flex;
+            gap: var(--spacing-md);
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .task-btn {
+            flex: 1;
+            min-width: 150px;
+            padding: var(--spacing-lg);
+            font-size: calc(18px * var(--font-scale));
+            font-weight: 700;
+            border: 3px solid;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-height: 70px;
+        }
+
+        .task-btn-primary {
+            background-color: var(--accent-color);
+            color: var(--bg-primary);
+            border-color: var(--accent-color);
+        }
+
+        .task-btn-secondary {
+            background-color: var(--bg-secondary);
+            color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
+        .task-btn:hover,
+        .task-btn:focus {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(255, 107, 107, 0.4);
+            outline: 4px solid var(--text-primary);
+            outline-offset: 3px;
+        }
+
+        .task-btn:active {
+            transform: translateY(0);
+        }
+
+        .task-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ==================== 进度指示器 ==================== */
+        .progress-section {
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .progress-bar-container {
+            background-color: var(--bg-secondary);
+            border: 3px solid var(--border-color);
+            border-radius: 50px;
+            height: 50px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--success-color);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--bg-primary);
+            font-weight: 700;
+            font-size: calc(18px * var(--font-scale));
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: var(--spacing-md);
+            font-size: calc(18px * var(--font-scale));
+            color: var(--text-secondary);
+        }
+
+        /* ==================== 通知消息 ==================== */
+        .notification {
+            position: fixed;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--accent-color);
+            color: var(--bg-primary);
+            padding: var(--spacing-lg) var(--spacing-xl);
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: calc(20px * var(--font-scale));
+            box-shadow: 0 8px 24px rgba(0,0,0,0.8);
+            z-index: 3000;
+            border: 4px solid var(--text-primary);
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        /* ==================== 响应式设计 ==================== */
+        @media (max-width: 600px) {
+            .task-actions {
+                flex-direction: column;
+            }
+
+            .task-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部工具栏 -->
+    <div class="top-toolbar">
+        <button class="toolbar-return-btn" id="returnBtn" aria-label="返回课程选择页面">
+            ← 返回
+        </button>
+        <div class="toolbar-title">
+            👁️ 视障用户模式
+        </div>
+        <div class="toolbar-badge" id="taskBadge">任务 1/5</div>
+    </div>
+
+    <!-- 主容器 -->
+    <div class="container">
+        <!-- 进度指示器 -->
+        <section class="progress-section" role="region" aria-label="学习进度">
+            <div class="progress-bar-container" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                <div class="progress-bar" id="progressBar" style="width: 0%;">
+                    0%
+                </div>
+            </div>
+            <p class="progress-text" id="progressText">已完成 0/5 个任务</p>
+        </section>
+
+        <!-- 任务列表 -->
+        <section class="task-section" role="region" aria-label="学习任务列表">
+            <!-- 任务1 -->
+            <article class="task-card active" id="task1" data-task-id="1" tabindex="0">
+                <div class="task-header">
+                    <div class="task-number" aria-hidden="true">1</div>
+                    <h2 class="task-title">了解AI助手</h2>
+                </div>
+                <div class="task-content">
+                    <p>AI助手是一个智能对话工具，可以理解您的语音或文字输入并给出回答。您可以通过语音输入的方式与AI进行交流，获取帮助和信息。</p>
+                </div>
+                <div class="task-actions">
+                    <button class="task-btn task-btn-primary" data-action="start" aria-label="开始任务1">
+                        开始任务
+                    </button>
+                    <button class="task-btn task-btn-secondary" data-action="skip" aria-label="跳过任务1">
+                        跳过
+                    </button>
+                </div>
+            </article>
+
+            <!-- 任务2 -->
+            <article class="task-card" id="task2" data-task-id="2" tabindex="0">
+                <div class="task-header">
+                    <div class="task-number" aria-hidden="true">2</div>
+                    <h2 class="task-title">提出简单问题</h2>
+                </div>
+                <div class="task-content">
+                    <p>现在尝试向AI提一个简单的问题。您可以使用语音输入说："今天天气怎么样？"或者"帮我推荐一本书"。AI会根据您的问题给出相应的回答。</p>
+                </div>
+                <div class="task-actions">
+                    <button class="task-btn task-btn-primary" data-action="start" aria-label="开始任务2" disabled>
+                        开始任务
+                    </button>
+                    <button class="task-btn task-btn-secondary" data-action="skip" aria-label="跳过任务2">
+                        跳过
+                    </button>
+                </div>
+            </article>
+
+            <!-- 任务3 -->
+            <article class="task-card" id="task3" data-task-id="3" tabindex="0">
+                <div class="task-header">
+                    <div class="task-number" aria-hidden="true">3</div>
+                    <h2 class="task-title">生成购物清单</h2>
+                </div>
+                <div class="task-content">
+                    <p>让AI帮您生成一份购物清单。您可以使用语音说："帮我列一份周末超市购物清单，包含蔬菜、水果和日用品"。AI会为您生成详细的清单。</p>
+                </div>
+                <div class="task-actions">
+                    <button class="task-btn task-btn-primary" data-action="start" aria-label="开始任务3" disabled>
+                        开始任务
+                    </button>
+                    <button class="task-btn task-btn-secondary" data-action="skip" aria-label="跳过任务3">
+                        跳过
+                    </button>
+                </div>
+            </article>
+
+            <!-- 任务4 -->
+            <article class="task-card" id="task4" data-task-id="4" tabindex="0">
+                <div class="task-header">
+                    <div class="task-number" aria-hidden="true">4</div>
+                    <h2 class="task-title">使用语音控制</h2>
+                </div>
+                <div class="task-content">
+                    <p>学习如何使用语音控制读屏系统。您可以说"暂停"来暂停朗读，说"继续"来继续朗读，说"重复"来重复上一句内容。</p>
+                </div>
+                <div class="task-actions">
+                    <button class="task-btn task-btn-primary" data-action="start" aria-label="开始任务4" disabled>
+                        开始任务
+                    </button>
+                    <button class="task-btn task-btn-secondary" data-action="skip" aria-label="跳过任务4">
+                        跳过
+                    </button>
+                </div>
+            </article>
+
+            <!-- 任务5 -->
+            <article class="task-card" id="task5" data-task-id="5" tabindex="0">
+                <div class="task-header">
+                    <div class="task-number" aria-hidden="true">5</div>
+                    <h2 class="task-title">完成学习</h2>
+                </div>
+                <div class="task-content">
+                    <p>恭喜您！您已经学会了AI助手的基本操作。点击"完成学习"按钮或说"完成学习"来查看您的学习成果。</p>
+                </div>
+                <div class="task-actions">
+                    <button class="task-btn task-btn-primary" data-action="complete" aria-label="完成学习" disabled>
+                        完成学习
+                    </button>
+                </div>
+            </article>
+        </section>
+    </div>
+
+    <script>
+        // ==================== 全局状态管理 ====================
+        const state = {
+            currentTask: 1,
+            completedTasks: [],
+            totalTasks: 5
+        };
+
+        // ==================== DOM元素 ====================
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const taskBadge = document.getElementById('taskBadge');
+
+
+        // ==================== 任务管理功能 ====================
+        function completeTask(taskId) {
+            if (!state.completedTasks.includes(taskId)) {
+                state.completedTasks.push(taskId);
+
+                const taskCard = document.getElementById(`task${taskId}`);
+                taskCard.classList.add('completed');
+                taskCard.classList.remove('active');
+
+                updateProgress();
+                showNotification(`任务${taskId}已完成！`);
+
+                if (taskId < state.totalTasks) {
+                    activateNextTask(taskId + 1);
+                } else {
+                    showNotification('恭喜！您已完成所有学习任务！');
+                    setTimeout(() => {
+                        window.location.href = 'course_selection.html?mode=visual';
+                    }, 3000);
+                }
+            }
+        }
+
+        function activateNextTask(taskId) {
+            state.currentTask = taskId;
+            const taskCard = document.getElementById(`task${taskId}`);
+            taskCard.classList.add('active');
+
+            const startBtn = taskCard.querySelector('[data-action="start"]') || 
+                           taskCard.querySelector('[data-action="complete"]');
+            if (startBtn) {
+                startBtn.disabled = false;
+            }
+
+            taskCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function updateProgress() {
+            const completed = state.completedTasks.length;
+            const percentage = Math.round((completed / state.totalTasks) * 100);
+
+            progressBar.style.width = `${percentage}%`;
+            progressBar.textContent = `${percentage}%`;
+            progressBar.parentElement.setAttribute('aria-valuenow', percentage);
+
+            progressText.textContent = `已完成 ${completed}/${state.totalTasks} 个任务`;
+            taskBadge.textContent = `任务 ${state.currentTask}/${state.totalTasks}`;
+        }
+
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            notification.setAttribute('role', 'alert');
+            notification.setAttribute('aria-live', 'assertive');
+
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+
+
+        // ==================== 任务按钮事件监听 ====================
+        document.querySelectorAll('.task-card').forEach(card => {
+            const taskId = parseInt(card.dataset.taskId);
+            const buttons = card.querySelectorAll('.task-btn');
+
+            buttons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const action = btn.dataset.action;
+
+                    switch(action) {
+                        case 'start':
+                            showNotification(`任务${taskId}已开始`);
+
+                            // 模拟任务完成
+                            setTimeout(() => {
+                                completeTask(taskId);
+                            }, 3000);
+                            break;
+
+                        case 'skip':
+                            completeTask(taskId);
+                            showNotification(`已跳过任务${taskId}`);
+                            break;
+
+                        case 'complete':
+                            completeTask(taskId);
+                            break;
+                    }
+                });
+            });
+        });
+
+
+
+
+        // ==================== 返回按钮功能 ====================
+        const returnBtn = document.getElementById('returnBtn');
+        returnBtn.addEventListener('click', () => {
+            window.location.href = 'course_selection.html?mode=visual';
+        });
+
+        // ==================== 页面初始化 ====================
+        window.addEventListener('load', () => {
+            // 初始化进度
+            updateProgress();
+        });
+
+        // ==================== PWA支持 ====================
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').catch(() => {
+                    console.log('Service Worker registration failed');
+                });
+            });
+        }
+    </script>
+</body>
+</html>

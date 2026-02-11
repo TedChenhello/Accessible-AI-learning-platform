@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <meta name="description" content="无障碍AI学习平台 - 专为视障、听障人士设计的AI学习工具">
+    <title>无障碍AI学习平台</title>
+
+    <!-- PWA支持 -->
+    <meta name="theme-color" content="#1a73e8">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json">
+
+    <style>
+        /* ==================== 基础样式与CSS变量 ==================== */
+        :root {
+            /* 标准模式颜色 */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f5f5f5;
+            --text-primary: #212121;
+            --text-secondary: #666666;
+            --accent-color: #1a73e8;
+            --success-color: #34a853;
+            --error-color: #ea4335;
+            --border-color: #e0e0e0;
+
+            /* 字体大小基准 - 默认设置为最大以便视障用户看清 */
+            --font-size-base: 16px;
+            --font-scale: 3;
+
+            /* 间距 */
+            --spacing-xs: 8px;
+            --spacing-sm: 12px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+        }
+
+        /* 高对比度模式 */
+        body.high-contrast {
+            --bg-primary: #000000;
+            --bg-secondary: #1a1a1a;
+            --text-primary: #ffffff;
+            --text-secondary: #cccccc;
+            --accent-color: #4da6ff;
+            --success-color: #66ff66;
+            --error-color: #ff6666;
+            --border-color: #444444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB",
+                         "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-size: calc(var(--font-size-base) * var(--font-scale));
+            line-height: 1.6;
+            color: var(--text-primary);
+            background-color: var(--bg-primary);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* ==================== 无障碍辅助功能栏 ==================== */
+        .accessibility-toolbar {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background-color: var(--bg-secondary);
+            border-bottom: 2px solid var(--border-color);
+            padding: var(--spacing-sm);
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-sm);
+            justify-content: center;
+        }
+
+        .toolbar-btn {
+            padding: var(--spacing-sm) var(--spacing-md);
+            font-size: calc(14px * var(--font-scale));
+            font-weight: 600;
+            color: var(--text-primary);
+            background-color: var(--bg-primary);
+            border: 2px solid var(--accent-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-height: 44px; /* 触摸目标最小尺寸 */
+            min-width: 44px;
+        }
+
+        .toolbar-btn:hover,
+        .toolbar-btn:focus {
+            background-color: var(--accent-color);
+            color: #ffffff;
+            transform: scale(1.05);
+            outline: 3px solid var(--accent-color);
+            outline-offset: 2px;
+        }
+
+        .toolbar-btn:active {
+            transform: scale(0.98);
+        }
+
+        .toolbar-btn.active {
+            background-color: var(--accent-color);
+            color: #ffffff;
+        }
+
+        /* ==================== 主容器 ==================== */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: var(--spacing-md);
+        }
+
+        /* ==================== 页面头部 ==================== */
+        .header {
+            text-align: center;
+            padding: var(--spacing-lg) 0;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .header h1 {
+            font-size: calc(28px * var(--font-scale));
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .header p {
+            font-size: calc(16px * var(--font-scale));
+            color: var(--text-secondary);
+        }
+
+        /* ==================== 语音控制面板 ==================== */
+        .voice-panel {
+            background-color: var(--bg-secondary);
+            border: 2px solid var(--accent-color);
+            border-radius: 12px;
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+            text-align: center;
+        }
+
+        .voice-status {
+            font-size: calc(18px * var(--font-scale));
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: var(--spacing-md);
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .voice-controls {
+            display: flex;
+            gap: var(--spacing-md);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .voice-btn {
+            padding: var(--spacing-md) var(--spacing-lg);
+            font-size: calc(18px * var(--font-scale));
+            font-weight: 600;
+            color: #ffffff;
+            background-color: var(--accent-color);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            min-height: 56px;
+            min-width: 120px;
+            transition: all 0.2s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .voice-btn:hover,
+        .voice-btn:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+            outline: 3px solid var(--accent-color);
+            outline-offset: 3px;
+        }
+
+        .voice-btn:active {
+            transform: translateY(0);
+        }
+
+        .voice-btn.speaking {
+            background-color: var(--success-color);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* ==================== 任务卡片 ==================== */
+        .task-section {
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .task-card {
+            background-color: var(--bg-secondary);
+            border: 3px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-md);
+            transition: all 0.3s;
+        }
+
+        .task-card.active {
+            border-color: var(--accent-color);
+            box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3);
+        }
+
+        .task-card.completed {
+            border-color: var(--success-color);
+            opacity: 0.8;
+        }
+
+        .task-header {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .task-number {
+            flex-shrink: 0;
+            width: 48px;
+            height: 48px;
+            background-color: var(--accent-color);
+            color: #ffffff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: calc(20px * var(--font-scale));
+            font-weight: 700;
+        }
+
+        .task-card.completed .task-number {
+            background-color: var(--success-color);
+        }
+
+        .task-title {
+            flex: 1;
+            font-size: calc(20px * var(--font-scale));
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .task-content {
+            font-size: calc(18px * var(--font-scale));
+            color: var(--text-primary);
+            line-height: 1.8;
+            margin-bottom: var(--spacing-md);
+            padding: var(--spacing-md);
+            background-color: var(--bg-primary);
+            border-radius: 8px;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .task-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: var(--spacing-md);
+            font-size: calc(16px * var(--font-scale));
+            font-weight: 600;
+            border: 2px solid;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-height: 48px;
+        }
+
+        .task-btn-primary {
+            background-color: var(--accent-color);
+            color: #ffffff;
+            border-color: var(--accent-color);
+        }
+
+        .task-btn-secondary {
+            background-color: var(--bg-primary);
+            color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
+        .task-btn:hover,
+        .task-btn:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            outline: 3px solid var(--accent-color);
+            outline-offset: 2px;
+        }
+
+        .task-btn:active {
+            transform: translateY(0);
+        }
+
+        .task-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ==================== 进度指示器 ==================== */
+        .progress-section {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .progress-bar-container {
+            background-color: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            height: 40px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--success-color);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-weight: 600;
+            font-size: calc(16px * var(--font-scale));
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: var(--spacing-sm);
+            font-size: calc(16px * var(--font-scale));
+            color: var(--text-secondary);
+        }
+
+        /* ==================== 通知消息 ==================== */
+        .notification {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            max-width: 90%;
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-radius: 8px;
+            font-size: calc(16px * var(--font-scale));
+            font-weight: 600;
+            z-index: 2000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        .notification.success {
+            background-color: var(--success-color);
+            color: #ffffff;
+        }
+
+        .notification.error {
+            background-color: var(--error-color);
+            color: #ffffff;
+        }
+
+        .notification.info {
+            background-color: var(--accent-color);
+            color: #ffffff;
+        }
+
+        /* ==================== 响应式设计 ==================== */
+        @media (max-width: 600px) {
+            .container {
+                padding: var(--spacing-sm);
+            }
+
+            .header h1 {
+                font-size: calc(24px * var(--font-scale));
+            }
+
+            .voice-btn {
+                min-width: 100px;
+                font-size: calc(16px * var(--font-scale));
+            }
+
+            .task-actions {
+                flex-direction: column;
+            }
+
+            .task-btn {
+                width: 100%;
+            }
+        }
+
+        /* ==================== 屏幕阅读器专用 ==================== */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+
+        /* ==================== 焦点可见性增强 ==================== */
+        *:focus-visible {
+            outline: 3px solid var(--accent-color);
+            outline-offset: 2px;
+        }
+
+        /* ==================== 视频播放器 ==================== */
+        .video-player-section {
+            margin-bottom: var(--spacing-xl);
+            background-color: var(--bg-secondary);
+            border: 3px solid var(--accent-color);
+            border-radius: 12px;
+            padding: var(--spacing-lg);
+        }
+
+        .video-player-title {
+            font-size: calc(24px * var(--font-scale));
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: var(--spacing-md);
+            text-align: center;
+        }
+
+        .video-screen {
+            background-color: #000000;
+            border-radius: 8px;
+            aspect-ratio: 16 / 9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: var(--spacing-md);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .video-placeholder {
+            color: #ffffff;
+            font-size: calc(20px * var(--font-scale));
+            text-align: center;
+            padding: var(--spacing-lg);
+        }
+
+        .video-status {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: calc(48px * var(--font-scale));
+            color: #ffffff;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+        }
+
+        .video-controls {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+
+        .video-progress-bar {
+            width: 100%;
+            height: 12px;
+            background-color: var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .video-progress-fill {
+            height: 100%;
+            background-color: var(--accent-color);
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        .video-buttons {
+            display: flex;
+            gap: var(--spacing-md);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .video-btn {
+            padding: var(--spacing-lg) var(--spacing-xl);
+            font-size: calc(20px * var(--font-scale));
+            font-weight: 700;
+            color: #ffffff;
+            background-color: var(--accent-color);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            min-height: 64px;
+            min-width: 150px;
+            transition: all 0.2s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .video-btn:hover,
+        .video-btn:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+
+        .video-btn:active {
+            transform: translateY(0);
+        }
+
+        .video-time-display {
+            text-align: center;
+            font-size: calc(18px * var(--font-scale));
+            color: var(--text-secondary);
+            margin-top: var(--spacing-sm);
+        }
+
+
+        /* ==================== 初始选择页面 ==================== */
+        .selection-page {
+            position: relative;
+            width: 100%;
+            min-height: 100vh;
+            background-color: var(--bg-primary);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: var(--spacing-lg);
+            overflow-y: visible;
+        }
+
+        .selection-page.hidden {
+            display: none;
+        }
+
+        .selection-icon {
+            font-size: 120px;
+            margin-bottom: var(--spacing-xl);
+            animation: pulse 2s infinite;
+        }
+
+        .selection-title {
+            font-size: calc(32px * var(--font-scale));
+            font-weight: 700;
+            color: var(--accent-color);
+            text-align: center;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .selection-subtitle {
+            font-size: calc(24px * var(--font-scale));
+            color: var(--text-secondary);
+            text-align: center;
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .selection-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-lg);
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .selection-btn {
+            padding: var(--spacing-xl);
+            font-size: calc(28px * var(--font-scale));
+            font-weight: 700;
+            color: #ffffff;
+            background-color: var(--accent-color);
+            border: 4px solid var(--accent-color);
+            border-radius: 16px;
+            cursor: pointer;
+            min-height: 120px;
+            transition: all 0.3s;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+
+        .selection-btn:hover,
+        .selection-btn:focus {
+            transform: scale(1.05);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.3);
+            outline: 4px solid var(--accent-color);
+            outline-offset: 4px;
+        }
+
+        .selection-btn:active {
+            transform: scale(0.98);
+        }
+
+        .selection-btn.visual-impaired {
+            background-color: #ff6b6b;
+            border-color: #ff6b6b;
+        }
+
+        .selection-btn.hearing-impaired {
+            background-color: #4ecdc4;
+            border-color: #4ecdc4;
+        }
+
+        .selection-btn.teacher-mode {
+            background-color: #9c27b0;
+            border-color: #9c27b0;
+        }
+
+    </style>
+</head>
+<body>
+    <!-- 初始选择页面 -->
+    <div class="selection-page" id="selectionPage">
+        <div class="selection-icon" aria-hidden="true">🎤</div>
+        <h1 class="selection-title">欢迎使用无障碍AI学习平台</h1>
+        <p class="selection-subtitle">请选择您的使用模式</p>
+
+        <div class="selection-buttons">
+            <button class="selection-btn visual-impaired" id="visualImpairedBtn"
+                    aria-label="进入视障用户模式">
+                👁️ 视障用户模式
+            </button>
+            <button class="selection-btn hearing-impaired" id="hearingImpairedBtn"
+                    aria-label="进入听障用户模式">
+                👂 听障用户模式
+            </button>
+            <button class="selection-btn teacher-mode" id="teacherModeBtn"
+                    aria-label="进入教师模式">
+                👨‍🏫 教师模式
+            </button>
+        </div>
+    </div>
+
+    <!-- 主内容区域（初始隐藏） -->
+    <div id="mainContent" style="display: none;">
+
+    <!-- 无障碍辅助功能栏 -->
+    <div class="accessibility-toolbar" role="toolbar" aria-label="无障碍辅助功能">
+        <button class="toolbar-btn" id="contrastBtn" aria-label="切换高对比度模式" aria-pressed="false">
+            🌓 高对比度
+        </button>
+        <button class="toolbar-btn" id="fontDecreaseBtn" aria-label="减小字体">
+            A-
+        </button>
+        <button class="toolbar-btn" id="fontIncreaseBtn" aria-label="增大字体">
+            A+
+        </button>
+    </div>
+
+    <!-- 主容器 -->
+    <div class="container">
+        <!-- 页面头部 -->
+        <header class="header" role="banner">
+            <h1>无障碍AI学习平台</h1>
+            <p>专为视障、听障人士设计的AI学习工具</p>
+        </header>
+
+        <!-- 语音控制面板 -->
+        <section class="voice-panel" role="region" aria-label="语音控制">
+            <div class="voice-status" id="voiceStatus" aria-live="polite" aria-atomic="true">
+                点击"开始语音引导"开始学习
+            </div>
+            <div class="voice-controls">
+                <button class="voice-btn" id="startVoiceBtn" aria-label="开始语音引导">
+                    🔊 开始语音引导
+                </button>
+                <button class="voice-btn" id="pauseVoiceBtn" aria-label="暂停语音" style="display: none;">
+                    ⏸️ 暂停
+                </button>
+                <button class="voice-btn" id="replayVoiceBtn" aria-label="重播当前步骤">
+                    🔄 重播
+                </button>
+            </div>
+        </section>
+
+        <!-- 视频播放器 -->
+        <section class="video-player-section" role="region" aria-label="教学视频播放器">
+            <h2 class="video-player-title">📹 AI学习教学视频</h2>
+
+            <div class="video-screen" id="videoScreen" role="img" aria-label="视频播放区域">
+                <div class="video-placeholder" id="videoPlaceholder">
+                    点击"播放视频"开始观看教学内容
+                </div>
+                <div class="video-status" id="videoStatus" style="display: none;">▶️</div>
+            </div>
+
+            <div class="video-controls">
+                <div class="video-progress-bar" id="videoProgressBar" role="progressbar"
+                     aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="视频播放进度">
+                    <div class="video-progress-fill" id="videoProgressFill"></div>
+                </div>
+
+                <div class="video-buttons">
+                    <button class="video-btn" id="playPauseBtn" aria-label="播放或暂停视频">
+                        ▶️ 播放视频
+                    </button>
+                    <button class="video-btn" id="restartBtn" aria-label="重新播放视频">
+                        🔄 重新播放
+                    </button>
+                </div>
+
+                <div class="video-time-display" id="videoTimeDisplay" aria-live="polite">
+                    00:00 / 05:00
+                </div>
+            </div>
+        </section>
+
+        <!-- 进度指示器 -->
+        <section class="progress-section" role="region" aria-label="学习进度">
+            <div class="progress-bar-container" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                <div class="progress-bar" id="progressBar" style="width: 0%;">
+                    0%
+                </div>
+            </div>
+            <p class="progress-text" id="progressText">已完成 0/5 个任务</p>
+        </section>
+
+        <!-- 任务列表 -->
+        <section class="task-section" role="region" aria-label="学习任务列表">
+            <!-- 任务1 -->
+            <article class="task-card active" id="task1" data-task-id="1">
+                <div class="task-header">
+                    <div class="task-number" aria-hidden="true">1</div>
+                    <h2 class="task-title">了解AI助手</h2>
+                </div>
+                <div class="task-content">
+                    <p>AI助手是一个智能对话工具，可以帮助您完成各种任务。请点击"开始任务"按钮，然后对着手机说："你好，请介绍一下你自己"。</p>
+                </div>
+                <div class="task-actions">
+                    <button class="task-btn task-btn-primary" data-action="start" aria-label="开始任务1">
+                        开始任务
+                    </button>
+                    <button class="task-btn task-btn-secondary" data-action="replay" aria-label="重播任务1说明">
+                        语音重播
+                    </button>
+                    <button class="task-btn task-btn-secondary" data-action="skip" aria-label="跳过任务1">
+                        跳过
+                    </button>
+                </div>
+            </article>
+
+            <!-- 任务2 -->
+            <article class="task-card" id="task2" data-task-id="2">
+                <div class="task-header">
+                    <div class="task-number" aria-hidden="true">2</div>
+                    <h2 class="task-title">提出简单问题</h2>
+                </div>
+                <div class="task-content">
+                    <p>现在尝试向AI提一个简单的问题。请说："今天天气怎么样？"或者"帮我推荐一本书"。</p>
+                </div>
+                <div class="task-actions">
+                    <button class="task-btn task-btn-primary" data-action="start" aria-label="开始任务2" disabled>
+                        开始任务
+                    </button>
+                    <button class="task-btn task-btn-secondary" data-action="replay" aria-label="重播任务2说明">
+                        语音重播
+                    </button>
+                    <button class="task-btn task-btn-secondary" data-action="skip" aria-label="跳过任务2">
+                        跳过
+                    </button>
+                </div>
+            </article>
+
+            <!-- 任务3 -->
+            <article class="task-card" id="task3" data-task-id="3">
+                <div class="task-header">
+                    <div class="task-number" aria-hidden="true">3</div>
+                    <h2 class="task-title">生成购物清单</h2>
+                </div>
+                <div class="task-content">
+                    <p>让AI帮您生成一份购物清单。请说："帮我列一份周末超市购物清单，包含蔬菜、水果和日用品"。</p>
+                </div>
+                <div class="task-actions">
+                    <button class="task-btn task-btn-primary" data-action="start" aria-label="开始任务3" disabled>
+                        开始任务
+                    </button>
+                    <button class="task-btn task-btn-secondary" data-action="replay" aria-label="重播任务3说明">
+                        语音重播
+                    </button>
+                    <button class="task-btn task-btn-secondary" data-action="skip" aria-label="跳过任务3">
+                        跳过
+                    </button>
+                </div>
+            </article>
+
+            <!-- 任务4 -->
+            <article class="task-card" id="task4" data-task-id="4">
+                <div class="task-header">
+                    <div class="task-number" aria-hidden="true">4</div>
+                    <h2 class="task-title">复制AI回复</h2>
+                </div>
+                <div class="task-content">
+                    <p>学习如何保存AI的回复。当AI生成内容后，找到"复制"按钮并点击它，将内容保存到剪贴板。</p>
+                </div>
+                <div class="task-actions">
+                    <button class="task-btn task-btn-primary" data-action="start" aria-label="开始任务4" disabled>
+                        开始任务
+                    </button>
+                    <button class="task-btn task-btn-secondary" data-action="replay" aria-label="重播任务4说明">
+                        语音重播
+                    </button>
+                    <button class="task-btn task-btn-secondary" data-action="skip" aria-label="跳过任务4">
+                        跳过
+                    </button>
+                </div>
+            </article>
+
+            <!-- 任务5 -->
+            <article class="task-card" id="task5" data-task-id="5">
+                <div class="task-header">
+                    <div class="task-number" aria-hidden="true">5</div>
+                    <h2 class="task-title">完成学习</h2>
+                </div>
+                <div class="task-content">
+                    <p>恭喜您！您已经学会了AI助手的基本操作。点击"完成学习"按钮查看您的学习成果。</p>
+                </div>
+                <div class="task-actions">
+                    <button class="task-btn task-btn-primary" data-action="complete" aria-label="完成学习" disabled>
+                        完成学习
+                    </button>
+                    <button class="task-btn task-btn-secondary" data-action="replay" aria-label="重播任务5说明">
+                        语音重播
+                    </button>
+                </div>
+            </article>
+        </section>
+    </div>
+    </div><!-- 关闭 mainContent -->
+
+    <script>
+        // ==================== 初始选择页面功能 ====================
+        const selectionPage = document.getElementById('selectionPage');
+        const mainContent = document.getElementById('mainContent');
+        const visualImpairedBtn = document.getElementById('visualImpairedBtn');
+        const hearingImpairedBtn = document.getElementById('hearingImpairedBtn');
+        const teacherModeBtn = document.getElementById('teacherModeBtn');
+
+
+        // 视障用户模式
+        visualImpairedBtn.addEventListener('click', () => {
+            enterVisualImpairedMode();
+        });
+
+        // 听障用户模式
+        hearingImpairedBtn.addEventListener('click', () => {
+            enterHearingImpairedMode();
+        });
+
+        // 教师模式
+        teacherModeBtn.addEventListener('click', () => {
+            enterTeacherMode();
+        });
+
+        function enterVisualImpairedMode() {
+            // 跳转到课程选择页面
+            window.location.href = 'course_selection.html?mode=visual';
+        }
+
+        function enterHearingImpairedMode() {
+            // 跳转到课程选择页面
+            window.location.href = 'course_selection.html?mode=hearing';
+        }
+
+        function enterTeacherMode() {
+            // 跳转到课程选择页面（教师模式）
+            window.location.href = 'course_selection.html?mode=teacher';
+        }
+
+        // ==================== 全局状态管理 ====================
+        const state = {
+            currentTask: 1,
+            completedTasks: [],
+            fontScale: 3,
+            highContrast: false,
+            vibrationEnabled: false,
+            voiceEnabled: false,
+            isSpeaking: false
+        };
+
+        // ==================== 辅助功能：高对比度模式 ====================
+        const contrastBtn = document.getElementById('contrastBtn');
+        contrastBtn.addEventListener('click', () => {
+            state.highContrast = !state.highContrast;
+            document.body.classList.toggle('high-contrast');
+            contrastBtn.classList.toggle('active');
+            contrastBtn.setAttribute('aria-pressed', state.highContrast);
+
+            announceToScreenReader(state.highContrast ? '已开启高对比度模式' : '已关闭高对比度模式');
+            triggerVibration(50);
+        });
+
+        // ==================== 辅助功能：字体缩放 ====================
+        const fontIncreaseBtn = document.getElementById('fontIncreaseBtn');
+        const fontDecreaseBtn = document.getElementById('fontDecreaseBtn');
+
+        fontIncreaseBtn.addEventListener('click', () => {
+            if (state.fontScale < 3) {
+                state.fontScale += 0.2;
+                document.documentElement.style.setProperty('--font-scale', state.fontScale);
+                announceToScreenReader(`字体已放大，当前缩放比例 ${Math.round(state.fontScale * 100)}%`);
+                triggerVibration(50);
+            }
+        });
+
+        fontDecreaseBtn.addEventListener('click', () => {
+            if (state.fontScale > 1) {
+                state.fontScale -= 0.2;
+                document.documentElement.style.setProperty('--font-scale', state.fontScale);
+                announceToScreenReader(`字体已缩小，当前缩放比例 ${Math.round(state.fontScale * 100)}%`);
+                triggerVibration(50);
+            }
+        });
+
+        // ==================== 辅助功能：振动反馈 ====================
+        const vibrationBtn = document.getElementById('vibrationBtn');
+        if (vibrationBtn) {
+            vibrationBtn.addEventListener('click', () => {
+                state.vibrationEnabled = !state.vibrationEnabled;
+                vibrationBtn.classList.toggle('active');
+                vibrationBtn.setAttribute('aria-pressed', state.vibrationEnabled);
+
+                announceToScreenReader(state.vibrationEnabled ? '已开启振动反馈' : '已关闭振动反馈');
+                if (state.vibrationEnabled) {
+                    triggerVibration(100);
+                }
+            });
+        }
+
+        // 振动反馈函数
+        function triggerVibration(duration = 50) {
+            if (state.vibrationEnabled && 'vibrate' in navigator) {
+                navigator.vibrate(duration);
+            }
+        }
+
+        // ==================== 视频播放器功能 ====================
+        const videoPlayer = {
+            isPlaying: false,
+            currentTime: 0,
+            duration: 300, // 5分钟 = 300秒
+            interval: null
+        };
+
+        const videoScreen = document.getElementById('videoScreen');
+        const videoPlaceholder = document.getElementById('videoPlaceholder');
+        const videoStatus = document.getElementById('videoStatus');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const restartBtn = document.getElementById('restartBtn');
+        const videoProgressBar = document.getElementById('videoProgressBar');
+        const videoProgressFill = document.getElementById('videoProgressFill');
+        const videoTimeDisplay = document.getElementById('videoTimeDisplay');
+
+        // 格式化时间显示
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // 更新视频进度
+        function updateVideoProgress() {
+            const percentage = (videoPlayer.currentTime / videoPlayer.duration) * 100;
+            videoProgressFill.style.width = `${percentage}%`;
+            videoProgressBar.setAttribute('aria-valuenow', percentage);
+            videoTimeDisplay.textContent = `${formatTime(videoPlayer.currentTime)} / ${formatTime(videoPlayer.duration)}`;
+        }
+
+        // 播放视频
+        function playVideo() {
+            videoPlayer.isPlaying = true;
+            videoPlaceholder.style.display = 'none';
+            videoStatus.style.display = 'block';
+            videoStatus.textContent = '▶️';
+            playPauseBtn.textContent = '⏸️ 暂停';
+            playPauseBtn.setAttribute('aria-label', '暂停视频');
+
+            announceToScreenReader('视频正在播放');
+
+            // 模拟视频播放
+            videoPlayer.interval = setInterval(() => {
+                videoPlayer.currentTime += 1;
+                updateVideoProgress();
+
+
+                // 视频结束
+                if (videoPlayer.currentTime >= videoPlayer.duration) {
+                    pauseVideo();
+                    showNotification('视频播放完毕', 'success');
+                }
+            }, 1000);
+        }
+
+        // 暂停视频
+        function pauseVideo() {
+            videoPlayer.isPlaying = false;
+            videoStatus.textContent = '⏸️';
+            playPauseBtn.textContent = '▶️ 播放';
+            playPauseBtn.setAttribute('aria-label', '播放视频');
+
+            if (videoPlayer.interval) {
+                clearInterval(videoPlayer.interval);
+                videoPlayer.interval = null;
+            }
+
+            announceToScreenReader('视频已暂停');
+        }
+
+        // 重启视频
+        function restartVideo() {
+            pauseVideo();
+            videoPlayer.currentTime = 0;
+            updateVideoProgress();
+            videoPlaceholder.style.display = 'block';
+            videoStatus.style.display = 'none';
+            announceToScreenReader('视频已重置到开始位置');
+        }
+
+        // 播放/暂停按钮事件
+        playPauseBtn.addEventListener('click', () => {
+            if (videoPlayer.isPlaying) {
+                pauseVideo();
+            } else {
+                playVideo();
+            }
+        });
+
+        // 重启按钮事件
+        restartBtn.addEventListener('click', () => {
+            restartVideo();
+        });
+
+        // 进度条点击事件
+        videoProgressBar.addEventListener('click', (e) => {
+            const rect = videoProgressBar.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const percentage = clickX / rect.width;
+            videoPlayer.currentTime = Math.floor(percentage * videoPlayer.duration);
+            updateVideoProgress();
+        });
+
+
+        // ==================== 屏幕阅读器通知 ====================
+        function announceToScreenReader(message) {
+            const announcement = document.createElement('div');
+            announcement.setAttribute('role', 'status');
+            announcement.setAttribute('aria-live', 'polite');
+            announcement.className = 'sr-only';
+            announcement.textContent = message;
+            document.body.appendChild(announcement);
+
+            setTimeout(() => {
+                document.body.removeChild(announcement);
+            }, 1000);
+        }
+
+
+        // ==================== 语音控制按钮 ====================
+        const startVoiceBtn = document.getElementById('startVoiceBtn');
+        const pauseVoiceBtn = document.getElementById('pauseVoiceBtn');
+        const replayVoiceBtn = document.getElementById('replayVoiceBtn');
+
+        startVoiceBtn.addEventListener('click', () => {
+            state.voiceEnabled = true;
+            const currentTaskCard = document.querySelector(`#task${state.currentTask}`);
+            const taskContent = currentTaskCard.querySelector('.task-content p').textContent;
+            announceToScreenReader('已开始语音引导');
+        });
+
+        pauseVoiceBtn.addEventListener('click', () => {
+            announceToScreenReader('语音已暂停');
+        });
+
+        replayVoiceBtn.addEventListener('click', () => {
+            announceToScreenReader('正在重播当前任务说明');
+        });
+
+
+
+        // ==================== 任务管理功能 ====================
+        function completeTask(taskId) {
+            if (!state.completedTasks.includes(taskId)) {
+                state.completedTasks.push(taskId);
+
+                const taskCard = document.getElementById(`task${taskId}`);
+                taskCard.classList.add('completed');
+                taskCard.classList.remove('active');
+
+                updateProgress();
+                triggerVibration(200);
+                showNotification(`任务${taskId}已完成！`, 'success');
+                announceToScreenReader(`任务${taskId}已完成`);
+
+                if (taskId < 5) {
+                    activateNextTask(taskId + 1);
+                } else {
+                    showNotification('恭喜！您已完成所有学习任务！', 'success');
+                }
+            }
+        }
+
+        function activateNextTask(taskId) {
+            state.currentTask = taskId;
+            const taskCard = document.getElementById(`task${taskId}`);
+            taskCard.classList.add('active');
+
+            const startBtn = taskCard.querySelector('[data-action="start"]') || taskCard.querySelector('[data-action="complete"]');
+            if (startBtn) {
+                startBtn.disabled = false;
+            }
+
+            taskCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            announceToScreenReader(`已激活任务${taskId}`);
+        }
+
+        function updateProgress() {
+            const totalTasks = 5;
+            const completed = state.completedTasks.length;
+            const percentage = Math.round((completed / totalTasks) * 100);
+
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+
+            progressBar.style.width = `${percentage}%`;
+            progressBar.textContent = `${percentage}%`;
+            progressBar.parentElement.setAttribute('aria-valuenow', percentage);
+
+            progressText.textContent = `已完成 ${completed}/${totalTasks} 个任务`;
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            notification.setAttribute('role', 'alert');
+
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // ==================== 任务按钮事件监听 ====================
+        document.querySelectorAll('.task-card').forEach(card => {
+            const taskId = parseInt(card.dataset.taskId);
+            const buttons = card.querySelectorAll('.task-btn');
+
+            buttons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const action = btn.dataset.action;
+
+                    switch(action) {
+                        case 'start':
+                            showNotification(`任务${taskId}已开始`, 'info');
+
+                            // 模拟任务完成（实际应用中这里会有真实的任务交互）
+                            setTimeout(() => {
+                                completeTask(taskId);
+                            }, 3000);
+                            break;
+
+                        case 'replay':
+                            announceToScreenReader(`正在重播任务${taskId}说明`);
+                            break;
+
+                        case 'skip':
+                            completeTask(taskId);
+                            showNotification(`已跳过任务${taskId}`, 'info');
+                            break;
+
+                        case 'complete':
+                            completeTask(taskId);
+                            break;
+                    }
+
+                    triggerVibration(50);
+                });
+            });
+        });
+
+        // ==================== 页面初始化 ====================
+        document.addEventListener('DOMContentLoaded', () => {
+            // 检测系统偏好设置
+            if (window.matchMedia && window.matchMedia('(prefers-contrast: high)').matches) {
+                contrastBtn.click();
+            }
+
+            // 初始化进度
+            updateProgress();
+
+            announceToScreenReader('页面已加载完成，准备开始学习');
+
+            announceToScreenReader('页面已加载完成，准备开始学习');
+        });
+
+
+        // ==================== PWA支持 ====================
+        // Service Worker功能暂未实现
+        // if ('serviceWorker' in navigator) {
+        //     window.addEventListener('load', () => {
+        //         navigator.serviceWorker.register('/sw.js').catch(() => {
+        //             console.log('Service Worker registration failed');
+        //         });
+        //     });
+        // }
+    </script>
+</body>
+</html>

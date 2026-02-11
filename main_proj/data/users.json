@@ -1,0 +1,36 @@
+{
+  "users": [
+    {
+      "id": "student_001",
+      "username": "student1",
+      "password": "123456",
+      "name": "学生1",
+      "role": "student",
+      "createdAt": "2026-02-11T00:00:00.000Z"
+    },
+    {
+      "id": "student_002",
+      "username": "student2",
+      "password": "123456",
+      "name": "学生2",
+      "role": "student",
+      "createdAt": "2026-02-11T00:00:00.000Z"
+    },
+    {
+      "id": "student_003",
+      "username": "student3",
+      "password": "123456",
+      "name": "学生3",
+      "role": "student",
+      "createdAt": "2026-02-11T00:00:00.000Z"
+    },
+    {
+      "id": "teacher_001",
+      "username": "teacher1",
+      "password": "123456",
+      "name": "教师1",
+      "role": "teacher",
+      "createdAt": "2026-02-11T00:00:00.000Z"
+    }
+  ]
+}

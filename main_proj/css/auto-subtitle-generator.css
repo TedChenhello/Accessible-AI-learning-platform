@@ -1,0 +1,214 @@
+/**
+ * 自动字幕生成器样式
+ * 适用于听障用户的视频播放器
+ */
+
+/* 字幕容器基础样式 */
+.auto-subtitle-container {
+    position: absolute;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 800px;
+    text-align: center;
+    pointer-events: none;
+    z-index: 100;
+}
+
+/* 字幕文本样式 */
+.auto-subtitle-text {
+    display: inline-block;
+    padding: 8px 16px;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.4;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    max-width: 100%;
+    word-wrap: break-word;
+}
+
+/* 临时字幕样式（识别中） */
+.auto-subtitle-text.interim {
+    opacity: 0.7;
+    font-style: italic;
+}
+
+/* 字幕控制面板 */
+.subtitle-control-panel {
+    background-color: var(--bg-primary, #ffffff);
+    border: 2px solid var(--accent-color, #1a9d95);
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 16px;
+}
+
+.subtitle-control-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--accent-color, #1a9d95);
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+/* 控制按钮组 */
+.subtitle-control-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.subtitle-control-btn {
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary, #333333);
+    background-color: var(--bg-secondary, #f5f5f5);
+    border: 2px solid var(--border-color, #e0e0e0);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-height: 40px;
+}
+
+.subtitle-control-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.subtitle-control-btn.active {
+    background-color: var(--success-color, #4caf50);
+    color: white;
+    border-color: var(--success-color, #4caf50);
+}
+
+.subtitle-control-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* 语言选择 */
+.subtitle-language-select {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.subtitle-language-select label {
+    font-size: 14px;
+    color: var(--text-primary, #333333);
+    font-weight: 600;
+}
+
+.subtitle-language-select select {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 2px solid var(--border-color, #e0e0e0);
+    border-radius: 8px;
+    background-color: var(--bg-secondary, #f5f5f5);
+    cursor: pointer;
+}
+
+/* 字幕历史记录 */
+.subtitle-history {
+    max-height: 200px;
+    overflow-y: auto;
+    background-color: var(--bg-secondary, #f5f5f5);
+    border: 2px solid var(--border-color, #e0e0e0);
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 16px;
+}
+
+.subtitle-history-item {
+    padding: 8px;
+    margin-bottom: 8px;
+    background-color: white;
+    border-radius: 4px;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.subtitle-history-time {
+    color: var(--accent-color, #1a9d95);
+    font-weight: 600;
+    margin-right: 8px;
+}
+
+.subtitle-history-text {
+    color: var(--text-primary, #333333);
+}
+
+/* 状态指示器 */
+.subtitle-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px;
+    margin-top: 12px;
+    font-size: 13px;
+    color: var(--text-secondary, #666666);
+}
+
+.subtitle-status-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: var(--error-color, #f44336);
+}
+
+.subtitle-status-indicator.active {
+    background-color: var(--success-color, #4caf50);
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .auto-subtitle-container {
+        width: 95%;
+        bottom: 50px;
+    }
+
+    .auto-subtitle-text {
+        font-size: 16px;
+        padding: 6px 12px;
+    }
+
+    .subtitle-control-buttons {
+        flex-direction: column;
+    }
+
+    .subtitle-control-btn {
+        width: 100%;
+    }
+}
+
+/* 高对比度模式（视障用户） */
+body.visual-mode .auto-subtitle-text {
+    font-size: 24px;
+    padding: 12px 20px;
+    background-color: rgba(0, 0, 0, 0.95);
+}
+
+/* 听障模式特定样式 */
+body.hearing-mode .auto-subtitle-text {
+    font-size: 22px;
+    background-color: rgba(0, 0, 0, 0.85);
+}

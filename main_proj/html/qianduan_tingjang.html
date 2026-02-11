@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <meta name="description" content="无障碍AI学习平台 - 听障用户专用版">
+    <title>无障碍AI学习平台 - 听障用户版</title>
+
+    <!-- PWA支持 -->
+    <meta name="theme-color" content="#4ecdc4">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="manifest" href="manifest.json">
+
+    <style>
+        /* ==================== 基础样式 ==================== */
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f5f5f5;
+            --text-primary: #212121;
+            --text-secondary: #666666;
+            --accent-color: #1a9d95;
+            --success-color: #34a853;
+            --error-color: #ea4335;
+            --border-color: #e0e0e0;
+            --user-msg-bg: #e3f2fd;
+            --ai-msg-bg: #f1f8e9;
+
+            /* 字体大小 - 听障用户使用正常大小 */
+            --font-size-base: 16px;
+            --font-scale: 1;
+
+            --spacing-xs: 8px;
+            --spacing-sm: 12px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+                         "Microsoft YaHei", sans-serif;
+            font-size: var(--font-size-base);
+            line-height: 1.6;
+            color: var(--text-primary);
+            background-color: var(--bg-primary);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ==================== 顶部工具栏 ==================== */
+        .top-toolbar {
+            background-color: var(--accent-color);
+            color: white;
+            padding: var(--spacing-md);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .toolbar-title {
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .vibration-indicator {
+            width: 12px;
+            height: 12px;
+            background-color: #66ff66;
+            border-radius: 50%;
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .toolbar-badge {
+            background-color: rgba(255,255,255,0.3);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 14px;
+        }
+
+        .toolbar-return-btn {
+            background-color: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-height: 40px;
+        }
+
+        .toolbar-return-btn:hover {
+            background-color: rgba(255,255,255,0.4);
+            transform: scale(1.05);
+        }
+
+        /* ==================== 进度条 ==================== */
+        .progress-bar-wrapper {
+            background-color: rgba(255,255,255,0.2);
+            height: 4px;
+            width: 100%;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background-color: white;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        /* ==================== 主容器 ==================== */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: var(--spacing-md);
+        }
+
+        /* ==================== 页面头部 ==================== */
+        .header {
+            text-align: center;
+            padding: var(--spacing-lg) 0;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .header h1 {
+            font-size: calc(28px * var(--font-scale));
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .header p {
+            font-size: calc(16px * var(--font-scale));
+            color: var(--text-secondary);
+        }
+
+        /* ==================== 文字提示面板 ==================== */
+        .text-panel {
+            background-color: var(--bg-secondary);
+            border: 2px solid var(--accent-color);
+            border-radius: 12px;
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+            text-align: center;
+        }
+
+        .text-status {
+            font-size: calc(18px * var(--font-scale));
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: var(--spacing-md);
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ==================== 实时字幕面板 ==================== */
+        .subtitle-panel {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: 3px solid #764ba2;
+            border-radius: 16px;
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+
+        .subtitle-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-md);
+            color: white;
+        }
+
+        .subtitle-title {
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .recording-indicator {
+            width: 16px;
+            height: 16px;
+            background-color: #ff4444;
+            border-radius: 50%;
+            animation: pulse-recording 1.5s infinite;
+            display: none;
+        }
+
+        .recording-indicator.active {
+            display: block;
+        }
+
+        @keyframes pulse-recording {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        .subtitle-display {
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 12px;
+            padding: var(--spacing-lg);
+            min-height: 120px;
+            margin-bottom: var(--spacing-md);
+            color: white;
+            font-size: 24px;
+            font-weight: 600;
+            line-height: 1.6;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            word-wrap: break-word;
+        }
+
+        .subtitle-text {
+            width: 100%;
+        }
+
+        .subtitle-interim {
+            color: #aaaaaa;
+            font-style: italic;
+        }
+
+        .subtitle-controls {
+            display: flex;
+            gap: var(--spacing-md);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .subtitle-btn {
+            padding: var(--spacing-md) var(--spacing-lg);
+            font-size: 18px;
+            font-weight: 700;
+            color: white;
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            border-radius: 50px;
+            cursor: pointer;
+            min-height: 56px;
+            min-width: 140px;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .subtitle-btn:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .subtitle-btn:active {
+            transform: translateY(0);
+        }
+
+        .subtitle-btn.recording {
+            background-color: #ff4444;
+            border-color: #ff4444;
+            animation: pulse 2s infinite;
+        }
+
+        .subtitle-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* ==================== 字幕历史记录 ==================== */
+        .subtitle-history {
+            background-color: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .subtitle-history-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: var(--spacing-md);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .subtitle-history-list {
+            list-style: none;
+        }
+
+        .subtitle-history-item {
+            background-color: var(--bg-primary);
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-sm);
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-color);
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .subtitle-history-time {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .subtitle-history-empty {
+            text-align: center;
+            color: var(--text-secondary);
+            padding: var(--spacing-lg);
+            font-style: italic;
+        }
+
+        .clear-history-btn {
+            width: 100%;
+            padding: var(--spacing-sm);
+            background-color: var(--error-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: var(--spacing-sm);
+            transition: all 0.2s;
+        }
+
+        .clear-history-btn:hover {
+            background-color: #d32f2f;
+            transform: translateY(-1px);
+        }
+
+        /* ==================== 任务卡片 ==================== */
+        .task-section {
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .task-card {
+            background-color: var(--bg-secondary);
+            border: 3px solid var(--border-color);
+            border-radius: 12px;
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-md);
+            transition: all 0.3s;
+        }
+
+        .task-card.active {
+            border-color: var(--accent-color);
+            box-shadow: 0 4px 12px rgba(78, 205, 196, 0.3);
+        }
+
+        .task-card.completed {
+            border-color: var(--success-color);
+            opacity: 0.8;
+        }
+
+        .task-header {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .task-number {
+            flex-shrink: 0;
+            width: 48px;
+            height: 48px;
+            background-color: var(--accent-color);
+            color: #ffffff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: calc(20px * var(--font-scale));
+            font-weight: 700;
+        }
+
+        .task-card.completed .task-number {
+            background-color: var(--success-color);
+        }
+
+        .task-title {
+            flex: 1;
+            font-size: calc(20px * var(--font-scale));
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .task-content {
+            font-size: calc(18px * var(--font-scale));
+            color: var(--text-primary);
+            line-height: 1.8;
+            margin-bottom: var(--spacing-md);
+            padding: var(--spacing-md);
+            background-color: var(--bg-primary);
+            border-radius: 8px;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .task-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: var(--spacing-md);
+            font-size: calc(16px * var(--font-scale));
+            font-weight: 600;
+            border: 2px solid;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-height: 48px;
+        }
+
+        .task-btn-primary {
+            background-color: var(--accent-color);
+            color: #ffffff;
+            border-color: var(--accent-color);
+        }
+
+        .task-btn-secondary {
+            background-color: var(--bg-primary);
+            color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
+        .task-btn:hover,
+        .task-btn:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            outline: 3px solid var(--accent-color);
+            outline-offset: 2px;
+        }
+
+        .task-btn:active {
+            transform: translateY(0);
+        }
+
+        .task-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ==================== 进度指示器 ==================== */
+        .progress-section {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .progress-bar-container {
+            background-color: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            height: 40px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--success-color);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-weight: 600;
+            font-size: calc(16px * var(--font-scale));
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: var(--spacing-sm);
+            font-size: calc(16px * var(--font-scale));
+            color: var(--text-secondary);
+        }
+
+        /* ==================== 视觉通知 ==================== */
+        .visual-notification {
+            position: fixed;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--accent-color);
+            color: white;
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-radius: 12px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 3000;
+            animation: slideDown 0.3s ease;
+        }
+
+        /* ==================== 响应式设计 ==================== */
+        @media (max-width: 600px) {
+            .message-content {
+                max-width: 85%;
+            }
+
+            .text-input {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部工具栏 -->
+    <div class="top-toolbar">
+        <button class="toolbar-return-btn" id="returnBtn" aria-label="返回课程选择页面">
+            ← 返回
+        </button>
+        <div class="toolbar-title">
+            <span class="vibration-indicator"></span>
+            听障用户模式
+        </div>
+        <div class="toolbar-badge">任务 1/5</div>
+    </div>
+
+    <!-- 进度条 -->
+    <div class="progress-bar-wrapper">
+        <div class="progress-bar-fill" id="progressBarFill"></div>
+    </div>
+
+    <!-- 主容器 -->
+    <div class="container">
+        <!-- 页面头部 -->
+        <header class="header" role="banner">
+            <h1>无障碍AI学习平台</h1>
+            <p>听障用户专用版 - 文字引导学习</p>
+        </header>
+
+        <!-- 文字提示面板 -->
+        <section class="text-panel" role="region" aria-label="文字提示">
+            <div class="text-status" id="textStatus" aria-live="polite" aria-atomic="true">
+                欢迎！请点击"开始任务"按钮开始学习
+            </div>
+        </section>
+
+        <!-- 实时字幕面板 -->
+        <section class="subtitle-panel" role="region" aria-label="实时字幕">
+            <div class="subtitle-header">
+                <div class="subtitle-title">
+                    🎤 实时语音转字幕
+                    <div class="recording-indicator" id="recordingIndicator"></div>
+                </div>
+            </div>
+
+            <div class="subtitle-display" id="subtitleDisplay" aria-live="polite" aria-atomic="true">
+                <div class="subtitle-text" id="subtitleText">
+                    点击"开始识别"按钮，开始将音频转换为字幕
+                </div>
+            </div>
+
+            <div class="subtitle-controls">
+                <button class="subtitle-btn" id="startRecognitionBtn" aria-label="开始语音识别">
+                    🎙️ 开始识别
+                </button>
+                <button class="subtitle-btn" id="stopRecognitionBtn" aria-label="停止语音识别" style="display: none;">
+                    ⏹️ 停止识别
+                </button>
+                <button class="subtitle-btn" id="clearSubtitleBtn" aria-label="清除字幕">
+                    🗑️ 清除字幕
+                </button>
+            </div>
+        </section>
+
+        <!-- 字幕历史记录 -->
+        <section class="subtitle-history" role="region" aria-label="字幕历史">
+            <div class="subtitle-history-title">
+                📝 字幕历史记录
+            </div>
+            <ul class="subtitle-history-list" id="subtitleHistoryList">
+                <li class="subtitle-history-empty">暂无字幕记录</li>
+            </ul>
+            <button class="clear-history-btn" id="clearHistoryBtn" style="display: none;">
+                清空历史记录
+            </button>
+        </section>
+
+        <!-- 进度指示器 -->
+        <section class="progress-section" role="region" aria-label="学习进度">
+            <div class="progress-bar-container" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                <div class="progress-bar" id="progressBar" style="width: 0%;">
+                    0%
+                </div>
+            </div>
+            <p class="progress-text" id="progressText">已完成 0/5 个任务</p>
+        </section>
+
+        <!-- 任务列表 -->
+        <section class="task-section" role="region" aria-label="学习任务列表">
+            <!-- 任务1 -->
+            <article class="task-card active" id="task1" data-task-id="1">
+                <div class="task-header">
+                    <div class="task-number" aria-hidden="true">1</div>
+                    <h2 class="task-title">了解AI助手</h2>
+                </div>
+                <div class="task-content">
+                    <p>AI助手是一个智能对话工具，可以理解您的文字输入并给出回答。您可以通过输入文字的方式与AI进行交流，获取帮助和信息。</p>
+                </div>
+                <div class="task-actions">
+                    <button class="task-btn task-btn-primary" data-action="start" aria-label="开始任务1">
+                        开始任务
+                    </button>
+                    <button class="task-btn task-btn-secondary" data-action="skip" aria-label="跳过任务1">
+                        跳过
+                    </button>
+                </div>
+            </article>
+
+            <!-- 任务2 -->
+            <article class="task-card" id="task2" data-task-id="2">
+                <div class="task-header">
+                    <div class="task-number" aria-hidden="true">2</div>
+                    <h2 class="task-title">提出简单问题</h2>
+                </div>
+                <div class="task-content">
+                    <p>现在尝试向AI提一个简单的问题。例如："今天天气怎么样？"或者"帮我推荐一本书"。AI会根据您的问题给出相应的回答。</p>
+                </div>
+                <div class="task-actions">
+                    <button class="task-btn task-btn-primary" data-action="start" aria-label="开始任务2" disabled>
+                        开始任务
+                    </button>
+                    <button class="task-btn task-btn-secondary" data-action="skip" aria-label="跳过任务2">
+                        跳过
+                    </button>
+                </div>
+            </article>
+
+            <!-- 任务3 -->
+            <article class="task-card" id="task3" data-task-id="3">
+                <div class="task-header">
+                    <div class="task-number" aria-hidden="true">3</div>
+                    <h2 class="task-title">生成购物清单</h2>
+                </div>
+                <div class="task-content">
+                    <p>让AI帮您生成一份购物清单。您可以输入："帮我列一份周末超市购物清单，包含蔬菜、水果和日用品"。AI会为您生成详细的清单。</p>
+                </div>
+                <div class="task-actions">
+                    <button class="task-btn task-btn-primary" data-action="start" aria-label="开始任务3" disabled>
+                        开始任务
+                    </button>
+                    <button class="task-btn task-btn-secondary" data-action="skip" aria-label="跳过任务3">
+                        跳过
+                    </button>
+                </div>
+            </article>
+
+            <!-- 任务4 -->
+            <article class="task-card" id="task4" data-task-id="4">
+                <div class="task-header">
+                    <div class="task-number" aria-hidden="true">4</div>
+                    <h2 class="task-title">复制AI回复</h2>
+                </div>
+                <div class="task-content">
+                    <p>学习如何保存AI的回复。当AI生成内容后，您可以长按文字选择复制，或者点击"复制"按钮将内容保存到剪贴板。</p>
+                </div>
+                <div class="task-actions">
+                    <button class="task-btn task-btn-primary" data-action="start" aria-label="开始任务4" disabled>
+                        开始任务
+                    </button>
+                    <button class="task-btn task-btn-secondary" data-action="skip" aria-label="跳过任务4">
+                        跳过
+                    </button>
+                </div>
+            </article>
+
+            <!-- 任务5 -->
+            <article class="task-card" id="task5" data-task-id="5">
+                <div class="task-header">
+                    <div class="task-number" aria-hidden="true">5</div>
+                    <h2 class="task-title">完成学习</h2>
+                </div>
+                <div class="task-content">
+                    <p>恭喜您！您已经学会了AI助手的基本操作。点击"完成学习"按钮查看您的学习成果。</p>
+                </div>
+                <div class="task-actions">
+                    <button class="task-btn task-btn-primary" data-action="complete" aria-label="完成学习" disabled>
+                        完成学习
+                    </button>
+                </div>
+            </article>
+        </section>
+    </div>
+
+    <script>
+        // ==================== 全局状态管理 ====================
+        const state = {
+            currentTask: 1,
+            completedTasks: [],
+            totalTasks: 5,
+            vibrationEnabled: true,
+            // 语音识别状态
+            recognition: null,
+            isRecognizing: false,
+            subtitleHistory: []
+        };
+
+        // ==================== DOM元素 ====================
+        const progressBarFill = document.getElementById('progressBarFill');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const textStatus = document.getElementById('textStatus');
+
+        // 字幕相关元素
+        const subtitleText = document.getElementById('subtitleText');
+        const recordingIndicator = document.getElementById('recordingIndicator');
+        const startRecognitionBtn = document.getElementById('startRecognitionBtn');
+        const stopRecognitionBtn = document.getElementById('stopRecognitionBtn');
+        const clearSubtitleBtn = document.getElementById('clearSubtitleBtn');
+        const subtitleHistoryList = document.getElementById('subtitleHistoryList');
+        const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+
+        // ==================== 振动反馈 ====================
+        function triggerVibration(pattern = 50) {
+            if (state.vibrationEnabled && 'vibrate' in navigator) {
+                navigator.vibrate(pattern);
+            }
+        }
+
+        // ==================== 语音识别初始化 ====================
+        function initSpeechRecognition() {
+            // 检查浏览器是否支持语音识别
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+            if (!SpeechRecognition) {
+                showVisualNotification('抱歉，您的浏览器不支持语音识别功能');
+                startRecognitionBtn.disabled = true;
+                subtitleText.textContent = '您的浏览器不支持语音识别，请使用Chrome或Edge浏览器';
+                return;
+            }
+
+            state.recognition = new SpeechRecognition();
+            state.recognition.continuous = true; // 持续识别
+            state.recognition.interimResults = true; // 显示临时结果
+            state.recognition.lang = 'zh-CN'; // 中文识别
+            state.recognition.maxAlternatives = 1;
+
+            // 识别开始
+            state.recognition.onstart = () => {
+                state.isRecognizing = true;
+                recordingIndicator.classList.add('active');
+                startRecognitionBtn.style.display = 'none';
+                stopRecognitionBtn.style.display = 'block';
+                stopRecognitionBtn.classList.add('recording');
+                subtitleText.textContent = '正在监听...';
+                showVisualNotification('语音识别已启动');
+                triggerVibration([100, 50, 100]);
+            };
+
+            // 识别结果
+            state.recognition.onresult = (event) => {
+                let interimTranscript = '';
+                let finalTranscript = '';
+
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const transcript = event.results[i][0].transcript;
+                    if (event.results[i].isFinal) {
+                        finalTranscript += transcript;
+                    } else {
+                        interimTranscript += transcript;
+                    }
+                }
+
+                // 显示识别结果
+                if (finalTranscript) {
+                    subtitleText.innerHTML = finalTranscript;
+                    addToHistory(finalTranscript);
+                    triggerVibration(50);
+                } else if (interimTranscript) {
+                    subtitleText.innerHTML = `<span class="subtitle-interim">${interimTranscript}</span>`;
+                }
+            };
+
+            // 识别错误
+            state.recognition.onerror = (event) => {
+                console.error('语音识别错误:', event.error);
+                let errorMessage = '识别出错';
+
+                switch(event.error) {
+                    case 'no-speech':
+                        errorMessage = '未检测到语音，请说话';
+                        break;
+                    case 'audio-capture':
+                        errorMessage = '无法访问麦克风';
+                        break;
+                    case 'not-allowed':
+                        errorMessage = '麦克风权限被拒绝';
+                        break;
+                    case 'network':
+                        errorMessage = '网络错误';
+                        break;
+                }
+
+                subtitleText.textContent = errorMessage;
+                showVisualNotification(errorMessage);
+            };
+
+            // 识别结束
+            state.recognition.onend = () => {
+                state.isRecognizing = false;
+                recordingIndicator.classList.remove('active');
+                startRecognitionBtn.style.display = 'block';
+                stopRecognitionBtn.style.display = 'none';
+                stopRecognitionBtn.classList.remove('recording');
+
+                if (subtitleText.textContent === '正在监听...') {
+                    subtitleText.textContent = '识别已停止';
+                }
+            };
+        }
+
+        // ==================== 显示视觉通知 ====================
+        function showVisualNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'visual-notification';
+            notification.textContent = message;
+            notification.setAttribute('role', 'alert');
+            document.body.appendChild(notification);
+
+            triggerVibration([100, 50, 100]);
+
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // ==================== 字幕历史记录管理 ====================
+        function addToHistory(text) {
+            const timestamp = new Date().toLocaleTimeString('zh-CN');
+            state.subtitleHistory.push({ text, timestamp });
+
+            // 更新历史列表显示
+            updateHistoryDisplay();
+        }
+
+        function updateHistoryDisplay() {
+            if (state.subtitleHistory.length === 0) {
+                subtitleHistoryList.innerHTML = '<li class="subtitle-history-empty">暂无字幕记录</li>';
+                clearHistoryBtn.style.display = 'none';
+            } else {
+                subtitleHistoryList.innerHTML = '';
+                // 只显示最近10条
+                const recentHistory = state.subtitleHistory.slice(-10).reverse();
+                recentHistory.forEach(item => {
+                    const li = document.createElement('li');
+                    li.className = 'subtitle-history-item';
+                    li.innerHTML = `
+                        <div class="subtitle-history-time">${item.timestamp}</div>
+                        <div>${item.text}</div>
+                    `;
+                    subtitleHistoryList.appendChild(li);
+                });
+                clearHistoryBtn.style.display = 'block';
+            }
+        }
+
+        function clearHistory() {
+            state.subtitleHistory = [];
+            updateHistoryDisplay();
+            showVisualNotification('历史记录已清空');
+        }
+
+        // ==================== 更新文字状态 ====================
+        function updateTextStatus(message) {
+            textStatus.textContent = message;
+        }
+
+        // ==================== 任务管理功能 ====================
+        function completeTask(taskId) {
+            if (!state.completedTasks.includes(taskId)) {
+                state.completedTasks.push(taskId);
+
+                const taskCard = document.getElementById(`task${taskId}`);
+                taskCard.classList.add('completed');
+                taskCard.classList.remove('active');
+
+                updateProgress();
+                triggerVibration([200, 100, 200]);
+                showVisualNotification(`任务${taskId}已完成！`);
+                updateTextStatus(`任务${taskId}已完成！`);
+
+                if (taskId < 5) {
+                    activateNextTask(taskId + 1);
+                } else {
+                    updateTextStatus('🎉 恭喜！您已完成所有学习任务！3秒后将返回课程选择页面。');
+                    showVisualNotification('恭喜！您已完成所有学习任务！');
+                    setTimeout(() => {
+                        window.location.href = 'course_selection.html?mode=hearing';
+                    }, 3000);
+                }
+            }
+        }
+
+        function activateNextTask(taskId) {
+            state.currentTask = taskId;
+            const taskCard = document.getElementById(`task${taskId}`);
+            taskCard.classList.add('active');
+
+            const startBtn = taskCard.querySelector('[data-action="start"]') || taskCard.querySelector('[data-action="complete"]');
+            if (startBtn) {
+                startBtn.disabled = false;
+            }
+
+            taskCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            const taskTitle = taskCard.querySelector('.task-title').textContent;
+            updateTextStatus(`下一个任务：${taskTitle}`);
+        }
+
+        function updateProgress() {
+            const totalTasks = 5;
+            const completed = state.completedTasks.length;
+            const percentage = Math.round((completed / totalTasks) * 100);
+
+            progressBar.style.width = `${percentage}%`;
+            progressBar.textContent = `${percentage}%`;
+            progressBar.parentElement.setAttribute('aria-valuenow', percentage);
+            progressBarFill.style.width = `${percentage}%`;
+
+            progressText.textContent = `已完成 ${completed}/${totalTasks} 个任务`;
+
+            const badge = document.querySelector('.toolbar-badge');
+            badge.textContent = `任务 ${state.currentTask}/${totalTasks}`;
+        }
+
+        // ==================== 任务按钮事件监听 ====================
+        document.querySelectorAll('.task-card').forEach(card => {
+            const taskId = parseInt(card.dataset.taskId);
+            const buttons = card.querySelectorAll('.task-btn');
+
+            buttons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const action = btn.dataset.action;
+
+                    switch(action) {
+                        case 'start':
+                            const taskContent = card.querySelector('.task-content p').textContent;
+                            updateTextStatus(`任务${taskId}进行中...`);
+                            showVisualNotification(`任务${taskId}已开始`);
+
+                            // 模拟任务完成
+                            setTimeout(() => {
+                                completeTask(taskId);
+                            }, 2000);
+                            break;
+
+                        case 'skip':
+                            completeTask(taskId);
+                            showVisualNotification(`已跳过任务${taskId}`);
+                            break;
+
+                        case 'complete':
+                            completeTask(taskId);
+                            break;
+                    }
+
+                    triggerVibration(50);
+                });
+            });
+        });
+
+        // ==================== 语音识别按钮事件 ====================
+        startRecognitionBtn.addEventListener('click', () => {
+            if (state.recognition && !state.isRecognizing) {
+                try {
+                    state.recognition.start();
+                } catch (error) {
+                    console.error('启动识别失败:', error);
+                    showVisualNotification('启动识别失败，请重试');
+                }
+            }
+        });
+
+        stopRecognitionBtn.addEventListener('click', () => {
+            if (state.recognition && state.isRecognizing) {
+                state.recognition.stop();
+                showVisualNotification('语音识别已停止');
+            }
+        });
+
+        clearSubtitleBtn.addEventListener('click', () => {
+            subtitleText.textContent = '字幕已清除';
+            triggerVibration(50);
+            setTimeout(() => {
+                if (!state.isRecognizing) {
+                    subtitleText.textContent = '点击"开始识别"按钮，开始将音频转换为字幕';
+                }
+            }, 2000);
+        });
+
+        clearHistoryBtn.addEventListener('click', () => {
+            if (confirm('确定要清空所有历史记录吗？')) {
+                clearHistory();
+            }
+        });
+
+        // ==================== 返回按钮功能 ====================
+        const returnBtn = document.getElementById('returnBtn');
+        returnBtn.addEventListener('click', () => {
+            // 停止识别
+            if (state.recognition && state.isRecognizing) {
+                state.recognition.stop();
+            }
+            updateTextStatus('正在返回课程选择页面...');
+            triggerVibration([100, 50, 100]);
+            setTimeout(() => {
+                window.location.href = 'course_selection.html?mode=hearing';
+            }, 500);
+        });
+
+        // ==================== 页面初始化 ====================
+        window.addEventListener('load', () => {
+            triggerVibration([100, 50, 100]);
+            showVisualNotification('欢迎使用听障用户模式');
+            updateProgress();
+
+            // 初始化语音识别
+            initSpeechRecognition();
+        });
+    </script>
+</body>
+</html>
