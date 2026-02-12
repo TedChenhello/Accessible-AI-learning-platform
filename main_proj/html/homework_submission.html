@@ -177,17 +177,25 @@
         
         /* ==================== 文件上传样式 ==================== */
         .file-upload-area {
+            display: block;
             border: 2px dashed var(--border-color);
             border-radius: 8px;
             padding: var(--spacing-lg);
             text-align: center;
             cursor: pointer;
             transition: all 0.2s;
+            background-color: transparent;
         }
-        
+
         .file-upload-area:hover {
             border-color: var(--accent-color);
             background-color: rgba(26, 115, 232, 0.05);
+        }
+
+        .file-upload-area:focus {
+            outline: 3px solid var(--accent-color);
+            outline-offset: 2px;
+            border-color: var(--accent-color);
         }
         
         .file-input {
@@ -412,6 +420,7 @@
         }
 
         .vi-file-upload-area {
+            display: block;
             border: 4px dashed var(--accent-color);
             border-radius: 16px;
             padding: var(--spacing-xl);
@@ -424,6 +433,12 @@
         .vi-file-upload-area:hover {
             background-color: rgba(26, 115, 232, 0.1);
             transform: scale(1.01);
+        }
+
+        .vi-file-upload-area:focus {
+            outline: 4px solid var(--accent-color);
+            outline-offset: 3px;
+            background-color: rgba(26, 115, 232, 0.15);
         }
 
         .vi-file-upload-icon {
@@ -496,14 +511,17 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">上传作业文件（可选）</label>
-                        <div class="file-upload-area" onclick="document.getElementById('fileInput').click()">
-                            <div style="font-size: 48px; margin-bottom: 8px;">📁</div>
+                        <label class="form-label" id="fileUploadLabel">上传作业文件（可选）</label>
+                        <label for="fileInput" class="file-upload-area" role="button" tabindex="0"
+                               aria-labelledby="fileUploadLabel"
+                               onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();document.getElementById('fileInput').click();}">
+                            <div style="font-size: 48px; margin-bottom: 8px;" aria-hidden="true">📁</div>
                             <div>点击上传文件（支持图片、视频、HTML等格式）</div>
-                        </div>
+                        </label>
                         <input type="file" id="fileInput" class="file-input"
                                accept="image/*,video/*,.html,.htm"
-                               onchange="handleFileUpload(this)">
+                               onchange="handleFileUpload(this)"
+                               aria-describedby="fileUploadLabel">
                         <div id="filePreview" class="file-preview" style="display:none;"></div>
                     </div>
 
@@ -540,17 +558,20 @@
                 </div>
 
                 <div class="vi-form-group">
-                    <label class="vi-form-label">上传作业文件（可选）</label>
-                    <div class="vi-file-upload-area" onclick="document.getElementById('viFileInput').click()">
-                        <div class="vi-file-upload-icon">📁</div>
+                    <label class="vi-form-label" id="viFileUploadLabel">上传作业文件（可选）</label>
+                    <label for="viFileInput" class="vi-file-upload-area" role="button" tabindex="0"
+                           aria-labelledby="viFileUploadLabel"
+                           onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();document.getElementById('viFileInput').click();}">
+                        <div class="vi-file-upload-icon" aria-hidden="true">📁</div>
                         <div class="vi-file-upload-text">点击上传文件</div>
                         <div style="font-size: 18px; margin-top: 8px; color: var(--text-secondary);">
                             支持图片、视频、HTML等格式
                         </div>
-                    </div>
+                    </label>
                     <input type="file" id="viFileInput" class="file-input"
                            accept="image/*,video/*,.html,.htm"
-                           onchange="handleViFileUpload(this)">
+                           onchange="handleViFileUpload(this)"
+                           aria-describedby="viFileUploadLabel">
                     <div id="viFilePreview" class="vi-file-preview" style="display:none;"></div>
                 </div>
 

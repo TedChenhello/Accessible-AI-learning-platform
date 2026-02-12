@@ -39,6 +39,26 @@
       "visitCount": 4,
       "completed": true,
       "completedAt": "2026-02-12T02:41:56.869Z"
+    },
+    {
+      "studentId": "user_1770874182317_aiumssl3s",
+      "courseId": "course_001",
+      "taskIndex": 0,
+      "startTime": "2026-02-12T05:31:39.172Z",
+      "lastActivity": "2026-02-12T05:34:13.715Z",
+      "visitCount": 16,
+      "completed": true,
+      "completedAt": "2026-02-12T05:34:13.715Z"
+    },
+    {
+      "studentId": "user_1770874182317_aiumssl3s",
+      "courseId": "course_001",
+      "taskIndex": 1,
+      "startTime": "2026-02-12T05:33:05.494Z",
+      "lastActivity": "2026-02-12T05:33:05.494Z",
+      "visitCount": 1,
+      "completed": false,
+      "completedAt": null
     }
   ]
 }
