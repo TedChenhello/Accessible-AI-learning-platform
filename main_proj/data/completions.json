@@ -1,3 +1,28 @@
 {
-  "completions": []
+  "completions": [
+    {
+      "id": "completion_1770864118791_pbq7vw5wt",
+      "courseId": "course_1770864050096_0jqcbkbg3",
+      "completedAt": "2026-02-12T02:41:58.789Z",
+      "userMode": "visual"
+    },
+    {
+      "id": "completion_1770864228958_uutpeqpn4",
+      "courseId": "course_001",
+      "completedAt": "2026-02-12T02:43:48.956Z",
+      "userMode": "visual"
+    },
+    {
+      "id": "completion_1770864249488_uv801o9ew",
+      "courseId": "course_002",
+      "completedAt": "2026-02-12T02:44:09.485Z",
+      "userMode": "visual"
+    },
+    {
+      "id": "completion_1770868917224_ck6eem3x7",
+      "courseId": "course_001",
+      "completedAt": "2026-02-12T04:01:57.222Z",
+      "userMode": "visual"
+    }
+  ]
 }

@@ -120,10 +120,22 @@
 
         /* ==================== 页面头部 ==================== */
         .header {
-            text-align: center;
             padding: var(--spacing-lg) 0;
             border-bottom: 2px solid var(--border-color);
             margin-bottom: var(--spacing-lg);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-md);
+        }
+
+        .header-text {
+            text-align: left;
         }
 
         .header h1 {
@@ -136,6 +148,33 @@
         .header p {
             font-size: calc(16px * var(--font-scale));
             color: var(--text-secondary);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .user-name {
+            font-size: calc(14px * var(--font-scale));
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .logout-btn {
+            padding: 8px 16px;
+            font-size: calc(14px * var(--font-scale));
+            color: white;
+            background-color: var(--error-color);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .logout-btn:hover {
+            background-color: #c5221f;
         }
 
         /* ==================== 语音控制面板 ==================== */
@@ -585,6 +624,42 @@
             margin-bottom: var(--spacing-xl);
         }
 
+        .selection-user-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .selection-user-name {
+            font-size: calc(20px * var(--font-scale));
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .selection-logout-btn {
+            padding: var(--spacing-md) var(--spacing-lg);
+            font-size: calc(20px * var(--font-scale));
+            font-weight: 600;
+            color: white;
+            background-color: var(--error-color);
+            border: 2px solid var(--error-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-height: 56px;
+            min-width: 150px;
+        }
+
+        .selection-logout-btn:hover,
+        .selection-logout-btn:focus {
+            background-color: #c5221f;
+            transform: scale(1.05);
+            outline: 3px solid var(--error-color);
+            outline-offset: 2px;
+        }
+
         .selection-buttons {
             display: flex;
             flex-direction: column;
@@ -641,6 +716,13 @@
     <div class="selection-page" id="selectionPage">
         <div class="selection-icon" aria-hidden="true">🎤</div>
         <h1 class="selection-title">欢迎使用无障碍AI学习平台</h1>
+
+        <!-- 用户信息栏 -->
+        <div class="selection-user-info" id="selectionUserInfo">
+            <span class="selection-user-name" id="selectionUserName"></span>
+            <button class="selection-logout-btn" id="selectionLogoutBtn" aria-label="登出账户">登出</button>
+        </div>
+
         <p class="selection-subtitle">请选择您的使用模式</p>
 
         <div class="selection-buttons">
@@ -679,8 +761,16 @@
     <div class="container">
         <!-- 页面头部 -->
         <header class="header" role="banner">
-            <h1>无障碍AI学习平台</h1>
-            <p>专为视障、听障人士设计的AI学习工具</p>
+            <div class="header-content">
+                <div class="header-text">
+                    <h1>无障碍AI学习平台</h1>
+                    <p>专为视障、听障人士设计的AI学习工具</p>
+                </div>
+                <div class="user-info" id="userInfo">
+                    <span class="user-name" id="userName"></span>
+                    <button class="logout-btn" id="logoutBtn">登出</button>
+                </div>
+            </div>
         </header>
 
         <!-- 语音控制面板 -->
@@ -856,6 +946,55 @@
     </div><!-- 关闭 mainContent -->
 
     <script>
+        // ==================== 用户登录状态检查 ====================
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
+        // 检查是否已登录
+        if (!currentUser) {
+            // 未登录，重定向到登录页面
+            window.location.href = 'login.html';
+        } else {
+            // 已登录，显示用户信息（选择页面）
+            const selectionUserName = document.getElementById('selectionUserName');
+            const selectionUserInfo = document.getElementById('selectionUserInfo');
+
+            if (selectionUserName && selectionUserInfo) {
+                selectionUserName.textContent = currentUser.name;
+                selectionUserInfo.style.display = 'flex';
+            }
+
+            // 已登录，显示用户信息（主内容区域）
+            const userName = document.getElementById('userName');
+            const userInfo = document.getElementById('userInfo');
+
+            if (userName && userInfo) {
+                userName.textContent = currentUser.name;
+                userInfo.style.display = 'flex';
+            }
+        }
+
+        // 登出功能（选择页面）
+        const selectionLogoutBtn = document.getElementById('selectionLogoutBtn');
+        if (selectionLogoutBtn) {
+            selectionLogoutBtn.addEventListener('click', () => {
+                if (confirm('确定要登出吗？')) {
+                    localStorage.removeItem('currentUser');
+                    window.location.href = 'login.html';
+                }
+            });
+        }
+
+        // 登出功能（主内容区域）
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                if (confirm('确定要登出吗？')) {
+                    localStorage.removeItem('currentUser');
+                    window.location.href = 'login.html';
+                }
+            });
+        }
+
         // ==================== 初始选择页面功能 ====================
         const selectionPage = document.getElementById('selectionPage');
         const mainContent = document.getElementById('mainContent');
@@ -890,8 +1029,8 @@
         }
 
         function enterTeacherMode() {
-            // 跳转到课程选择页面（教师模式）
-            window.location.href = 'course_selection.html?mode=teacher';
+            // 直接跳转到教师管理后台
+            window.location.href = 'teacher_dashboard.html?mode=teacher';
         }
 
         // ==================== 全局状态管理 ====================

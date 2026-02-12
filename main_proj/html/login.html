@@ -204,7 +204,84 @@
     </div>
 
     <script>
-        // JavaScript will be added here
+        const loginForm = document.getElementById('loginForm');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const loginBtn = document.getElementById('loginBtn');
+        const errorMessage = document.getElementById('errorMessage');
+
+        // 检查是否已登录
+        const currentUser = localStorage.getItem('currentUser');
+        if (currentUser) {
+            // 已登录，跳转到首页
+            window.location.href = 'qianduan.html';
+        }
+
+        // 处理登录表单提交
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value.trim();
+
+            if (!username || !password) {
+                showError('请输入用户名和密码');
+                return;
+            }
+
+            // 禁用登录按钮
+            loginBtn.disabled = true;
+            loginBtn.textContent = '登录中...';
+
+            try {
+                const response = await fetch('http://localhost:3000/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // 登录成功，保存用户信息
+                    localStorage.setItem('currentUser', JSON.stringify(data.user));
+
+                    // 跳转到首页
+                    window.location.href = 'qianduan.html';
+                } else {
+                    showError(data.message || '登录失败');
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = '登录';
+                }
+            } catch (error) {
+                console.error('登录错误:', error);
+                showError('网络错误，请稍后重试');
+                loginBtn.disabled = false;
+                loginBtn.textContent = '登录';
+            }
+        });
+
+        // 显示错误信息
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.add('show');
+            setTimeout(() => {
+                errorMessage.classList.remove('show');
+            }, 3000);
+        }
+
+        // 演示账号快速填充
+        document.querySelectorAll('.demo-account').forEach(account => {
+            account.addEventListener('click', () => {
+                const username = account.dataset.username;
+                const password = account.dataset.password;
+                usernameInput.value = username;
+                passwordInput.value = password;
+                usernameInput.focus();
+            });
+        });
     </script>
 </body>
 </html>

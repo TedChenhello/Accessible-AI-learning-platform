@@ -2,13 +2,43 @@
   "progress": [
     {
       "studentId": "student_001",
-      "courseId": "course_001",
+      "courseId": "course_002",
       "taskIndex": 0,
-      "startTime": "2026-02-11T05:23:53.663Z",
-      "lastActivity": "2026-02-11T05:29:49.458Z",
-      "visitCount": 5,
-      "completed": false,
-      "completedAt": null
+      "startTime": "2026-02-11T07:03:03.766Z",
+      "lastActivity": "2026-02-11T07:03:09.842Z",
+      "visitCount": 2,
+      "completed": true,
+      "completedAt": "2026-02-11T07:03:09.842Z"
+    },
+    {
+      "studentId": "student_001",
+      "courseId": "course_002",
+      "taskIndex": 1,
+      "startTime": "2026-02-11T07:03:22.922Z",
+      "lastActivity": "2026-02-12T02:44:08.179Z",
+      "visitCount": 3,
+      "completed": true,
+      "completedAt": "2026-02-11T07:03:27.353Z"
+    },
+    {
+      "studentId": "student_001",
+      "courseId": "course_001",
+      "taskIndex": 1,
+      "startTime": "2026-02-11T07:37:56.734Z",
+      "lastActivity": "2026-02-12T04:01:55.850Z",
+      "visitCount": 3,
+      "completed": true,
+      "completedAt": "2026-02-12T04:01:55.850Z"
+    },
+    {
+      "studentId": "teacher_001",
+      "courseId": "course_1770864050096_0jqcbkbg3",
+      "taskIndex": 0,
+      "startTime": "2026-02-12T02:41:06.369Z",
+      "lastActivity": "2026-02-12T02:41:56.869Z",
+      "visitCount": 4,
+      "completed": true,
+      "completedAt": "2026-02-12T02:41:56.869Z"
     }
   ]
 }

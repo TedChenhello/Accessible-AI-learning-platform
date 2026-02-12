@@ -31,6 +31,14 @@
       "name": "教师1",
       "role": "teacher",
       "createdAt": "2026-02-11T00:00:00.000Z"
+    },
+    {
+      "id": "student_1770869151406_xww2jw0zy",
+      "username": "114514",
+      "password": "123456",
+      "name": "114514",
+      "role": "student",
+      "createdAt": "2026-02-12T04:05:51.406Z"
     }
   ]
 }

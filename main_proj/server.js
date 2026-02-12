@@ -5,6 +5,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const fs = require('fs').promises;
 const path = require('path');
+const multer = require('multer');
 
 const app = express();
 const PORT = 3000;
@@ -19,12 +20,124 @@ const COURSES_FILE = path.join(__dirname, 'data', 'courses.json');
 const HOMEWORK_FILE = path.join(__dirname, 'data', 'homework.json');
 const COMPLETIONS_FILE = path.join(__dirname, 'data', 'completions.json');
 const SUBTITLES_DIR = path.join(__dirname, 'data', 'subtitles');
+const VIDEOS_DIR = path.join(__dirname, 'data', 'videos');
+const HOMEWORK_SUBMISSIONS_DIR = path.join(__dirname, 'data', 'homework_submissions');
 const PROGRESS_FILE = path.join(__dirname, 'data', 'student_progress.json');
 const USERS_FILE = path.join(__dirname, 'data', 'users.json');
 
 // ==================== AssemblyAI配置 ====================
 const ASSEMBLYAI_API_KEY = process.env.ASSEMBLYAI_API_KEY || '';
 const ASSEMBLYAI_API_URL = 'https://api.assemblyai.com/v2';
+
+// ==================== Claude API配置 ====================
+const CLAUDE_API_KEY = process.env.CLAUDE_API_KEY || '';
+const CLAUDE_API_URL = 'https://api.anthropic.com/v1/messages';
+
+// ==================== Multer文件上传配置 ====================
+// 视频文件存储配置
+const videoStorage = multer.diskStorage({
+    destination: async (req, file, cb) => {
+        try {
+            await fs.mkdir(VIDEOS_DIR, { recursive: true });
+            cb(null, VIDEOS_DIR);
+        } catch (error) {
+            cb(error, null);
+        }
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const ext = path.extname(file.originalname);
+        cb(null, 'video-' + uniqueSuffix + ext);
+    }
+});
+
+const videoUpload = multer({
+    storage: videoStorage,
+    limits: {
+        fileSize: 500 * 1024 * 1024 // 500MB限制
+    },
+    fileFilter: (req, file, cb) => {
+        const allowedTypes = ['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime'];
+        if (allowedTypes.includes(file.mimetype)) {
+            cb(null, true);
+        } else {
+            cb(new Error('只支持视频文件格式（MP4, WebM, OGG, MOV）'));
+        }
+    }
+});
+
+// 字幕文件存储配置
+const subtitleStorage = multer.diskStorage({
+    destination: async (req, file, cb) => {
+        try {
+            await fs.mkdir(SUBTITLES_DIR, { recursive: true });
+            cb(null, SUBTITLES_DIR);
+        } catch (error) {
+            cb(error, null);
+        }
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const ext = path.extname(file.originalname);
+        cb(null, 'subtitle-' + uniqueSuffix + ext);
+    }
+});
+
+const subtitleUpload = multer({
+    storage: subtitleStorage,
+    limits: {
+        fileSize: 10 * 1024 * 1024 // 10MB限制
+    },
+    fileFilter: (req, file, cb) => {
+        const ext = path.extname(file.originalname).toLowerCase();
+        if (ext === '.vtt' || ext === '.srt') {
+            cb(null, true);
+        } else {
+            cb(new Error('只支持VTT和SRT格式的字幕文件'));
+        }
+    }
+});
+
+// 作业文件存储配置
+const homeworkStorage = multer.diskStorage({
+    destination: async (req, file, cb) => {
+        try {
+            await fs.mkdir(HOMEWORK_SUBMISSIONS_DIR, { recursive: true });
+            cb(null, HOMEWORK_SUBMISSIONS_DIR);
+        } catch (error) {
+            cb(error, null);
+        }
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const ext = path.extname(file.originalname);
+        const basename = path.basename(file.originalname, ext);
+        cb(null, 'homework-' + uniqueSuffix + '-' + basename + ext);
+    }
+});
+
+const homeworkUpload = multer({
+    storage: homeworkStorage,
+    limits: {
+        fileSize: 50 * 1024 * 1024 // 50MB限制
+    },
+    fileFilter: (req, file, cb) => {
+        // 允许常见的作业文件格式
+        const allowedTypes = [
+            'image/jpeg', 'image/png', 'image/gif', 'image/webp',
+            'video/mp4', 'video/webm', 'video/ogg',
+            'text/html', 'text/plain',
+            'application/pdf',
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        ];
+        if (allowedTypes.includes(file.mimetype) || file.originalname.endsWith('.html') || file.originalname.endsWith('.htm')) {
+            cb(null, true);
+        } else {
+            cb(new Error('不支持的文件格式'));
+        }
+    }
+});
 
 // ==================== 辅助函数 ====================
 // 读取JSON文件
@@ -52,6 +165,151 @@ async function writeJSONFile(filePath, data) {
 // 生成唯一ID
 function generateId(prefix) {
     return `${prefix}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+}
+
+// ==================== 术语分析辅助函数 ====================
+// 解析VTT字幕文件，提取纯文本
+async function parseVTTSubtitles(vttFilePath) {
+    try {
+        const vttContent = await fs.readFile(vttFilePath, 'utf8');
+
+        // 移除WEBVTT头部和时间戳，只保留文本内容
+        const lines = vttContent.split('\n');
+        const textLines = [];
+
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i].trim();
+
+            // 跳过空行、WEBVTT标记、序号和时间戳行
+            if (line === '' ||
+                line === 'WEBVTT' ||
+                /^\d+$/.test(line) ||
+                /-->/.test(line)) {
+                continue;
+            }
+
+            textLines.push(line);
+        }
+
+        return textLines.join(' ');
+    } catch (error) {
+        console.error('解析VTT文件失败:', error);
+        return null;
+    }
+}
+
+// 调用Claude API分析术语
+async function analyzeTermsWithClaude(subtitleText, courseId) {
+    if (!CLAUDE_API_KEY) {
+        throw new Error('Claude API密钥未配置');
+    }
+
+    try {
+        const prompt = `请分析以下课程字幕，识别所有AI相关的专业术语并提供简洁的解释。
+
+要求：
+1. 只识别真正的AI专业术语（如：机器学习、神经网络、深度学习等），不要识别常用词
+2. 解释要通俗易懂，适合初学者理解
+3. 每个术语的解释控制在50字以内
+4. 返回JSON格式，格式如下：
+{
+  "terms": [
+    {
+      "term": "术语名称",
+      "definition": "术语解释"
+    }
+  ]
+}
+
+字幕内容：
+${subtitleText}
+
+请直接返回JSON，不要添加任何其他文字。`;
+
+        const response = await fetch(CLAUDE_API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-api-key': CLAUDE_API_KEY,
+                'anthropic-version': '2023-06-01'
+            },
+            body: JSON.stringify({
+                model: 'claude-3-5-sonnet-20241022',
+                max_tokens: 2000,
+                messages: [
+                    {
+                        role: 'user',
+                        content: prompt
+                    }
+                ]
+            })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`Claude API错误: ${response.statusText} - ${JSON.stringify(errorData)}`);
+        }
+
+        const data = await response.json();
+        const content = data.content[0].text;
+
+        // 尝试解析JSON响应
+        const jsonMatch = content.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) {
+            throw new Error('Claude返回的内容不是有效的JSON格式');
+        }
+
+        const termsData = JSON.parse(jsonMatch[0]);
+
+        return {
+            courseId: courseId,
+            generatedAt: new Date().toISOString(),
+            terms: termsData.terms || []
+        };
+
+    } catch (error) {
+        console.error('Claude API调用失败:', error);
+        throw error;
+    }
+}
+
+// 保存术语文件
+async function saveTermsFile(courseId, termsData) {
+    try {
+        const termsFilePath = path.join(SUBTITLES_DIR, `${courseId}_terms.json`);
+        await writeJSONFile(termsFilePath, termsData);
+        return termsFilePath;
+    } catch (error) {
+        console.error('保存术语文件失败:', error);
+        throw error;
+    }
+}
+
+// 为课程分析术语（完整流程）
+async function analyzeTermsForCourse(courseId, vttFilePath) {
+    try {
+        console.log(`[术语分析] 开始分析课程 ${courseId}`);
+
+        // 1. 解析VTT字幕文件
+        const subtitleText = await parseVTTSubtitles(vttFilePath);
+        if (!subtitleText) {
+            throw new Error('字幕文件解析失败');
+        }
+        console.log(`[术语分析] 字幕文本长度: ${subtitleText.length} 字符`);
+
+        // 2. 调用Claude API分析术语
+        const termsData = await analyzeTermsWithClaude(subtitleText, courseId);
+        console.log(`[术语分析] 识别到 ${termsData.terms.length} 个术语`);
+
+        // 3. 保存术语文件
+        const termsFilePath = await saveTermsFile(courseId, termsData);
+        console.log(`[术语分析] 术语文件已保存: ${termsFilePath}`);
+
+        return termsData;
+    } catch (error) {
+        console.error(`[术语分析] 失败:`, error);
+        throw error;
+    }
 }
 
 
@@ -167,6 +425,90 @@ app.delete('/api/courses/:id', async (req, res) => {
     }
 });
 
+
+// ==================== 文件上传API ====================
+// 上传视频文件
+app.post('/api/upload/video', videoUpload.single('video'), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ success: false, message: '没有上传视频文件' });
+        }
+
+        // 返回视频文件的相对路径
+        const videoUrl = `data/videos/${req.file.filename}`;
+
+        res.json({
+            success: true,
+            message: '视频上传成功',
+            videoUrl: videoUrl,
+            filename: req.file.filename,
+            size: req.file.size
+        });
+    } catch (error) {
+        console.error('视频上传失败:', error);
+        res.status(500).json({
+            success: false,
+            message: '视频上传失败',
+            error: error.message
+        });
+    }
+});
+
+// 上传字幕文件
+app.post('/api/upload/subtitle', subtitleUpload.single('subtitle'), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ success: false, message: '没有上传字幕文件' });
+        }
+
+        // 返回字幕文件的相对路径
+        const subtitleUrl = `data/subtitles/${req.file.filename}`;
+
+        res.json({
+            success: true,
+            message: '字幕上传成功',
+            subtitleUrl: subtitleUrl,
+            filename: req.file.filename,
+            size: req.file.size
+        });
+    } catch (error) {
+        console.error('字幕上传失败:', error);
+        res.status(500).json({
+            success: false,
+            message: '字幕上传失败',
+            error: error.message
+        });
+    }
+});
+
+// 上传作业文件
+app.post('/api/upload/homework', homeworkUpload.single('file'), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ success: false, message: '没有上传文件' });
+        }
+
+        // 返回文件的绝对路径（以/开头）
+        const fileUrl = `/data/homework_submissions/${req.file.filename}`;
+
+        res.json({
+            success: true,
+            message: '文件上传成功',
+            fileUrl: fileUrl,
+            filename: req.file.filename,
+            originalName: req.file.originalname,
+            size: req.file.size,
+            mimetype: req.file.mimetype
+        });
+    } catch (error) {
+        console.error('作业文件上传失败:', error);
+        res.status(500).json({
+            success: false,
+            message: '文件上传失败',
+            error: error.message
+        });
+    }
+});
 
 // ==================== 作业管理API ====================
 // 获取所有作业
@@ -302,8 +644,10 @@ app.post('/api/submissions', async (req, res) => {
         homeworkId: req.body.homeworkId,
         studentId: req.body.studentId || 'student_001',
         note: req.body.note || '',
-        files: req.body.files || [],
-        submittedAt: new Date().toISOString(),
+        fileUrl: req.body.fileUrl || '',
+        fileName: req.body.fileName || '纯文字提交',
+        mimetype: req.body.mimetype || '',
+        submittedAt: req.body.submittedAt || new Date().toISOString(),
         status: 'submitted'
     };
 
@@ -490,6 +834,16 @@ app.post('/api/subtitles/to-vtt', async (req, res) => {
         const vttFilePath = path.join(SUBTITLES_DIR, `${courseId}_subtitles.vtt`);
         await fs.writeFile(vttFilePath, vttContent, 'utf8');
 
+        // 自动触发术语分析（异步执行，不阻塞响应）
+        if (CLAUDE_API_KEY) {
+            console.log(`开始为课程 ${courseId} 分析术语...`);
+            analyzeTermsForCourse(courseId, vttFilePath).catch(error => {
+                console.error(`课程 ${courseId} 术语分析失败:`, error.message);
+            });
+        } else {
+            console.log('Claude API密钥未配置，跳过术语分析');
+        }
+
         res.json({
             success: true,
             message: '字幕生成成功',
@@ -527,6 +881,76 @@ app.get('/api/subtitles/:courseId', async (req, res) => {
         });
     }
 });
+
+// ==================== 术语分析API ====================
+// 手动触发术语分析
+app.post('/api/terms/analyze', async (req, res) => {
+    const { courseId } = req.body;
+
+    if (!courseId) {
+        return res.status(400).json({ success: false, message: '缺少courseId参数' });
+    }
+
+    if (!CLAUDE_API_KEY) {
+        return res.status(500).json({ success: false, message: 'Claude API密钥未配置' });
+    }
+
+    try {
+        // 检查字幕文件是否存在
+        const vttFilePath = path.join(SUBTITLES_DIR, `${courseId}_subtitles.vtt`);
+        await fs.access(vttFilePath);
+
+        // 执行术语分析
+        const termsData = await analyzeTermsForCourse(courseId, vttFilePath);
+
+        res.json({
+            success: true,
+            message: '术语分析完成',
+            termsCount: termsData.terms.length,
+            filePath: `data/subtitles/${courseId}_terms.json`
+        });
+
+    } catch (error) {
+        console.error('术语分析失败:', error);
+        res.status(500).json({
+            success: false,
+            message: '术语分析失败',
+            error: error.message
+        });
+    }
+});
+
+// 获取课程术语
+app.get('/api/terms/:courseId', async (req, res) => {
+    const { courseId } = req.params;
+    const termsFilePath = path.join(SUBTITLES_DIR, `${courseId}_terms.json`);
+
+    try {
+        await fs.access(termsFilePath);
+        const termsData = await readJSONFile(termsFilePath);
+
+        if (termsData) {
+            res.json({
+                success: true,
+                terms: termsData.terms,
+                generatedAt: termsData.generatedAt,
+                courseId: termsData.courseId
+            });
+        } else {
+            res.status(500).json({
+                success: false,
+                message: '读取术语文件失败'
+            });
+        }
+    } catch (error) {
+        res.json({
+            success: true,
+            exists: false,
+            message: '术语文件不存在'
+        });
+    }
+});
+
 
 // 辅助函数：转换为WebVTT格式
 function convertToWebVTT(words) {
@@ -581,7 +1005,7 @@ function formatTime(milliseconds) {
 }
 
 // ==================== 用户认证API ====================
-// 用户登录
+// 用户登录（支持自动注册）
 app.post('/api/login', async (req, res) => {
     const { username, password } = req.body;
 
@@ -594,15 +1018,43 @@ app.post('/api/login', async (req, res) => {
         return res.status(500).json({ success: false, message: '读取用户数据失败' });
     }
 
-    // 查找用户
-    const user = data.users.find(u => u.username === username && u.password === password);
+    // 查找用户名是否存在
+    const existingUser = data.users.find(u => u.username === username);
 
-    if (user) {
-        // 登录成功，返回用户信息（不包含密码）
-        const { password, ...userInfo } = user;
-        res.json({ success: true, user: userInfo });
+    if (existingUser) {
+        // 用户名存在，检查密码
+        if (existingUser.password === password) {
+            // 密码正确，登录成功
+            const { password, ...userInfo } = existingUser;
+            res.json({ success: true, user: userInfo });
+        } else {
+            // 密码错误
+            res.status(401).json({ success: false, message: '密码错误，请重新尝试' });
+        }
     } else {
-        res.status(401).json({ success: false, message: '用户名或密码错误' });
+        // 用户名不存在，自动创建新账户
+        const newUser = {
+            id: generateId('user'),
+            username: username,
+            password: password,
+            name: username, // 默认使用用户名作为显示名称
+            createdAt: new Date().toISOString()
+        };
+
+        data.users.push(newUser);
+        const success = await writeJSONFile(USERS_FILE, data);
+
+        if (success) {
+            // 自动注册成功，返回用户信息
+            const { password, ...userInfo } = newUser;
+            res.json({
+                success: true,
+                user: userInfo,
+                isNewUser: true // 标记这是新注册的用户
+            });
+        } else {
+            res.status(500).json({ success: false, message: '创建账户失败' });
+        }
     }
 });
 
@@ -688,7 +1140,7 @@ app.get('/api/progress/all', async (req, res) => {
     }
 });
 
-// 获取卡住的学生（停留时间超过5分钟且未完成）
+// 获取卡住的学生（停留时间超过1分钟且未完成）
 app.get('/api/progress/stuck', async (req, res) => {
     const data = await readJSONFile(PROGRESS_FILE);
     if (!data) {
@@ -696,16 +1148,36 @@ app.get('/api/progress/stuck', async (req, res) => {
     }
 
     const now = new Date();
-    const stuckThreshold = 5 * 60 * 1000; // 5分钟（毫秒）
+    const stuckThreshold = 1 * 60 * 1000; // 1分钟（毫秒）
+
+    console.log('\n========== 检测卡住的学生 ==========');
+    console.log('当前时间:', now.toISOString());
+    console.log('阈值:', stuckThreshold / 1000, '秒');
+    console.log('总进度记录数:', data.progress.length);
 
     const stuckStudents = data.progress.filter(p => {
-        if (p.completed) return false;
+        if (p.completed) {
+            console.log(`- 跳过 ${p.studentId}/${p.courseId}: 已完成`);
+            return false;
+        }
 
         const lastActivity = new Date(p.lastActivity);
         const timeDiff = now - lastActivity;
+        const timeDiffSeconds = Math.floor(timeDiff / 1000);
 
-        return timeDiff > stuckThreshold;
+        console.log(`- 检查 ${p.studentId}/${p.courseId}: 最后活动 ${p.lastActivity}, 时间差 ${timeDiffSeconds}秒`);
+
+        if (timeDiff > stuckThreshold) {
+            console.log(`  ✓ 卡住了！(${timeDiffSeconds}秒 > ${stuckThreshold / 1000}秒)`);
+            return true;
+        } else {
+            console.log(`  ✗ 未卡住 (${timeDiffSeconds}秒 <= ${stuckThreshold / 1000}秒)`);
+            return false;
+        }
     });
+
+    console.log('卡住的学生数:', stuckStudents.length);
+    console.log('=====================================\n');
 
     res.json({ success: true, stuckStudents: stuckStudents });
 });
@@ -721,6 +1193,8 @@ app.listen(PORT, () => {
     console.log(`  - POST   /api/courses          创建新课程`);
     console.log(`  - PUT    /api/courses/:id      更新课程`);
     console.log(`  - DELETE /api/courses/:id      删除课程`);
+    console.log(`  - POST   /api/upload/video     上传视频文件`);
+    console.log(`  - POST   /api/upload/subtitle  上传字幕文件`);
     console.log(`  - GET    /api/homework         获取所有作业`);
     console.log(`  - POST   /api/homework         创建新作业`);
     console.log(`  - POST   /api/submissions      提交作业`);
@@ -729,6 +1203,8 @@ app.listen(PORT, () => {
     console.log(`  - GET    /api/subtitles/status/:id 检查转录状态`);
     console.log(`  - POST   /api/subtitles/to-vtt 转换为WebVTT格式`);
     console.log(`  - GET    /api/subtitles/:courseId 获取课程字幕`);
+    console.log(`  - POST   /api/terms/analyze    分析课程术语`);
+    console.log(`  - GET    /api/terms/:courseId  获取课程术语`);
     console.log(`===========================================`);
 });
 

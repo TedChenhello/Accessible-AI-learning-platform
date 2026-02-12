@@ -385,14 +385,32 @@
         <div class="tabs">
             <button class="tab-btn active" data-tab="courses">课程管理</button>
             <button class="tab-btn" data-tab="homework">作业管理</button>
+            <button class="tab-btn" data-tab="homework-monitor">作业监控</button>
             <button class="tab-btn" data-tab="progress">学生进度监控</button>
         </div>
         
         <!-- 课程管理标签页 -->
         <div class="tab-content active" id="courses-tab">
-            <!-- 创建课程表单 -->
+            <!-- 现有课程列表 -->
             <div class="form-card">
-                <h2 class="form-title">➕ 创建新课程</h2>
+                <h2 class="form-title">📚 现有课程</h2>
+                <div id="existingCoursesList">
+                    <p style="color: var(--text-secondary); text-align: center;">加载中...</p>
+                </div>
+            </div>
+
+            <!-- 创建新课程按钮 -->
+            <div class="form-card" style="text-align: center; padding: var(--spacing-lg);">
+                <button class="btn btn-success" id="createNewCourseBtn" style="font-size: 18px; padding: var(--spacing-md) var(--spacing-xl);">
+                    ➕ 创建新课程
+                </button>
+                <p class="form-hint" style="margin-top: var(--spacing-sm);">点击按钮创建一个新的空白课程，然后在下方编辑课程内容</p>
+            </div>
+
+            <!-- 编辑课程表单 -->
+            <div class="form-card">
+                <h2 class="form-title" id="courseFormTitle">✏️ 编辑课程</h2>
+                <p class="form-hint" style="margin-bottom: var(--spacing-lg);" id="courseFormHint">请先点击上方"创建新课程"按钮，或从课程列表中选择要编辑的课程</p>
                 <form id="courseForm">
                     <div class="form-group">
                         <label class="form-label" for="courseTitle">课程标题 *</label>
@@ -412,18 +430,38 @@
                                   placeholder="输入课程的详细文字内容..."></textarea>
                         <p class="form-hint">可以包含学习步骤、知识点讲解等</p>
                     </div>
-                    
+
                     <div class="form-group">
-                        <label class="form-label" for="courseVideo">课程视频</label>
-                        <div class="file-upload-area" onclick="document.getElementById('courseVideoInput').click()">
-                            <div class="file-upload-icon">🎥</div>
-                            <div class="file-upload-text">点击上传视频文件（支持MP4、AVI等格式）</div>
+                        <label class="form-label">课程视频文件</label>
+                        <div class="file-upload-area" id="videoUploadArea">
+                            <div class="file-upload-icon">🎬</div>
+                            <div class="file-upload-text">
+                                点击或拖拽上传视频文件<br>
+                                <small>支持 MP4, WebM, OGG 等格式</small>
+                            </div>
                         </div>
-                        <input type="file" id="courseVideoInput" class="file-input" 
-                               accept="video/*" onchange="handleVideoUpload(this, 'courseVideoPreview')">
-                        <div id="courseVideoPreview" class="file-preview" style="display:none;"></div>
+                        <input type="file" id="courseVideoFile" class="file-input" accept="video/*">
+                        <div id="videoFilePreview" class="file-preview" style="display: none;">
+                            <strong>已选择：</strong><span id="videoFileName"></span>
+                        </div>
                     </div>
-                    
+
+                    <div class="form-group">
+                        <label class="form-label">视频字幕文件（可选）</label>
+                        <div class="file-upload-area" id="subtitleUploadArea">
+                            <div class="file-upload-icon">📝</div>
+                            <div class="file-upload-text">
+                                点击或拖拽上传字幕文件<br>
+                                <small>支持 VTT, SRT 格式</small>
+                            </div>
+                        </div>
+                        <input type="file" id="courseSubtitleFile" class="file-input" accept=".vtt,.srt">
+                        <div id="subtitleFilePreview" class="file-preview" style="display: none;">
+                            <strong>已选择：</strong><span id="subtitleFileName"></span>
+                        </div>
+                        <p class="form-hint">如果不上传字幕文件，系统将自动生成字幕</p>
+                    </div>
+
                     <div class="form-group">
                         <label class="form-label" for="courseAILink">AI实践链接</label>
                         <input type="url" id="courseAILink" class="form-input"
@@ -445,7 +483,7 @@
                         </button>
                     </div>
 
-                    <button type="submit" class="btn btn-primary">创建课程</button>
+                    <button type="submit" class="btn btn-primary" id="courseSubmitBtn" disabled>保存课程</button>
                 </form>
             </div>
         </div>
@@ -482,6 +520,31 @@
                     
                     <button type="submit" class="btn btn-success">布置作业</button>
                 </form>
+            </div>
+        </div>
+
+        <!-- 作业监控标签页 -->
+        <div class="tab-content" id="homework-monitor-tab">
+            <div class="form-card">
+                <h2 class="form-title">📊 作业提交监控</h2>
+                <p class="form-hint">查看所有学生的作业提交情况</p>
+
+                <!-- 刷新按钮 -->
+                <button class="btn btn-primary" id="refreshHomeworkBtn" style="margin-bottom: 20px;">
+                    🔄 刷新数据
+                </button>
+
+                <!-- 作业提交统计 -->
+                <div id="homeworkStatsSection" style="margin-bottom: 30px;">
+                    <h3 style="margin-bottom: 15px;">📈 提交统计</h3>
+                    <div id="homeworkStatsList"></div>
+                </div>
+
+                <!-- 学生作业详情 -->
+                <div id="studentHomeworkSection">
+                    <h3 style="margin-bottom: 15px;">📋 学生作业详情</h3>
+                    <div id="studentHomeworkList"></div>
+                </div>
             </div>
         </div>
 
@@ -525,9 +588,8 @@
             document.querySelector('[data-tab="homework"]').classList.add('active');
             document.getElementById('homework-tab').classList.add('active');
         } else if (action === 'edit' && courseId) {
-            // 编辑课程模式 - 保持在课程管理标签页
-            // 这里可以添加加载课程数据的逻辑
-            console.log('编辑课程ID:', courseId);
+            // 编辑课程模式 - 加载课程数据
+            editCourse(courseId);
         }
         // action === 'create' 或默认情况下，显示课程管理标签页（默认已激活）
 
@@ -550,7 +612,8 @@
                 taskParams: {
                     aiPlatform: 'DeepSeek',
                     promptTemplate: '',
-                    expectedLength: ''
+                    expectedLength: '',
+                    submissionType: 'text' // 默认为文字提交
                 },
                 order: courseTasks.length + 1
             };
@@ -608,6 +671,16 @@
                                onchange="updateTaskParam('${task.taskId}', 'promptTemplate', this.value)"
                                placeholder="例如：你好，我是[你的名字]...">
                     </div>
+                    <div class="form-group">
+                        <label class="form-label">提交类型</label>
+                        <select class="form-input" onchange="updateTaskParam('${task.taskId}', 'submissionType', this.value)">
+                            <option value="text" ${task.taskParams.submissionType === 'text' ? 'selected' : ''}>文字</option>
+                            <option value="image" ${task.taskParams.submissionType === 'image' ? 'selected' : ''}>图片</option>
+                            <option value="video" ${task.taskParams.submissionType === 'video' ? 'selected' : ''}>视频</option>
+                            <option value="file" ${task.taskParams.submissionType === 'file' ? 'selected' : ''}>文件</option>
+                        </select>
+                        <p class="form-hint">选择学生提交任务的方式</p>
+                    </div>
                 `;
                 tasksList.appendChild(taskItem);
             });
@@ -652,34 +725,298 @@
         });
         
         // ==================== 文件上传处理 ====================
-        function handleVideoUpload(input, previewId) {
-            const file = input.files[0];
-            const preview = document.getElementById(previewId);
-            
-            if (file) {
-                preview.style.display = 'block';
-                preview.innerHTML = `
-                    <strong>已选择文件：</strong> ${file.name} 
-                    <br><strong>文件大小：</strong> ${(file.size / 1024 / 1024).toFixed(2)} MB
-                `;
-            } else {
-                preview.style.display = 'none';
+        // 视频文件上传
+        const videoUploadArea = document.getElementById('videoUploadArea');
+        const courseVideoFile = document.getElementById('courseVideoFile');
+        const videoFilePreview = document.getElementById('videoFilePreview');
+        const videoFileName = document.getElementById('videoFileName');
+
+        if (videoUploadArea && courseVideoFile) {
+            // 点击上传区域触发文件选择
+            videoUploadArea.addEventListener('click', () => {
+                courseVideoFile.click();
+            });
+
+            // 文件选择后显示预览
+            courseVideoFile.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    videoFileName.textContent = file.name;
+                    videoFilePreview.style.display = 'block';
+                }
+            });
+
+            // 拖拽上传支持
+            videoUploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                videoUploadArea.style.borderColor = 'var(--accent-color)';
+                videoUploadArea.style.backgroundColor = 'rgba(26, 115, 232, 0.05)';
+            });
+
+            videoUploadArea.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                videoUploadArea.style.borderColor = 'var(--border-color)';
+                videoUploadArea.style.backgroundColor = '';
+            });
+
+            videoUploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                videoUploadArea.style.borderColor = 'var(--border-color)';
+                videoUploadArea.style.backgroundColor = '';
+
+                const file = e.dataTransfer.files[0];
+                if (file && file.type.startsWith('video/')) {
+                    courseVideoFile.files = e.dataTransfer.files;
+                    videoFileName.textContent = file.name;
+                    videoFilePreview.style.display = 'block';
+                } else {
+                    alert('请上传视频文件');
+                }
+            });
+        }
+
+        // 字幕文件上传
+        const subtitleUploadArea = document.getElementById('subtitleUploadArea');
+        const courseSubtitleFile = document.getElementById('courseSubtitleFile');
+        const subtitleFilePreview = document.getElementById('subtitleFilePreview');
+        const subtitleFileName = document.getElementById('subtitleFileName');
+
+        if (subtitleUploadArea && courseSubtitleFile) {
+            // 点击上传区域触发文件选择
+            subtitleUploadArea.addEventListener('click', () => {
+                courseSubtitleFile.click();
+            });
+
+            // 文件选择后显示预览
+            courseSubtitleFile.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    subtitleFileName.textContent = file.name;
+                    subtitleFilePreview.style.display = 'block';
+                }
+            });
+
+            // 拖拽上传支持
+            subtitleUploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                subtitleUploadArea.style.borderColor = 'var(--accent-color)';
+                subtitleUploadArea.style.backgroundColor = 'rgba(26, 115, 232, 0.05)';
+            });
+
+            subtitleUploadArea.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                subtitleUploadArea.style.borderColor = 'var(--border-color)';
+                subtitleUploadArea.style.backgroundColor = '';
+            });
+
+            subtitleUploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                subtitleUploadArea.style.borderColor = 'var(--border-color)';
+                subtitleUploadArea.style.backgroundColor = '';
+
+                const file = e.dataTransfer.files[0];
+                if (file && (file.name.endsWith('.vtt') || file.name.endsWith('.srt'))) {
+                    courseSubtitleFile.files = e.dataTransfer.files;
+                    subtitleFileName.textContent = file.name;
+                    subtitleFilePreview.style.display = 'block';
+                } else {
+                    alert('请上传VTT或SRT格式的字幕文件');
+                }
+            });
+        }
+
+        // ==================== 字幕文件上传功能 ====================
+        async function uploadSubtitleFile(subtitleFile) {
+            try {
+                const formData = new FormData();
+                formData.append('subtitle', subtitleFile);
+
+                const uploadResponse = await fetch('http://localhost:3000/api/upload/subtitle', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!uploadResponse.ok) {
+                    throw new Error('字幕上传失败');
+                }
+
+                const uploadResult = await uploadResponse.json();
+
+                if (uploadResult.success) {
+                    return uploadResult.subtitleUrl;
+                } else {
+                    return null;
+                }
+            } catch (error) {
+                console.error('字幕上传失败:', error);
+                return null;
             }
         }
-        
+
+        // ==================== 字幕生成功能 ====================
+        async function generateSubtitlesForVideo(videoUrl) {
+            try {
+                // 检查是否是本地文件路径
+                const isLocalFile = videoUrl.startsWith('data/') ||
+                                   videoUrl.includes('localhost') ||
+                                   !videoUrl.startsWith('http://') && !videoUrl.startsWith('https://');
+
+                if (isLocalFile) {
+                    console.warn('[字幕生成] 检测到本地文件，AssemblyAI 无法访问本地文件');
+                    throw new Error('本地视频文件无法自动生成字幕。AssemblyAI 需要公开可访问的视频 URL。请手动上传字幕文件。');
+                }
+
+                // 提交转录任务
+                const submitResponse = await fetch('http://localhost:3000/api/subtitles/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        videoUrl: videoUrl,
+                        courseId: 'temp_' + Date.now(), // 临时课程ID
+                        language: 'zh'
+                    })
+                });
+
+                if (!submitResponse.ok) {
+                    throw new Error('提交转录任务失败');
+                }
+
+                const submitData = await submitResponse.json();
+                const transcriptId = submitData.transcriptId;
+
+                // 轮询检查转录状态
+                let completed = false;
+                let attempts = 0;
+                const maxAttempts = 60; // 最多等待3分钟（每3秒检查一次）
+
+                while (!completed && attempts < maxAttempts) {
+                    await new Promise(resolve => setTimeout(resolve, 3000)); // 等待3秒
+
+                    const statusResponse = await fetch(`http://localhost:3000/api/subtitles/status/${transcriptId}`);
+                    if (!statusResponse.ok) {
+                        throw new Error('检查转录状态失败');
+                    }
+
+                    const statusData = await statusResponse.json();
+
+                    if (statusData.status === 'completed') {
+                        completed = true;
+                    } else if (statusData.status === 'error') {
+                        throw new Error('转录失败');
+                    }
+
+                    attempts++;
+                }
+
+                if (!completed) {
+                    throw new Error('转录超时');
+                }
+
+                // 生成VTT文件
+                const vttResponse = await fetch('http://localhost:3000/api/subtitles/to-vtt', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        transcriptId: transcriptId,
+                        courseId: 'temp_' + Date.now()
+                    })
+                });
+
+                if (!vttResponse.ok) {
+                    throw new Error('生成VTT文件失败');
+                }
+
+                const vttData = await vttResponse.json();
+                return vttData.filePath; // 返回字幕文件路径
+
+            } catch (error) {
+                console.error('生成字幕失败:', error);
+                return null;
+            }
+        }
+
         // ==================== 课程表单提交 ====================
         document.getElementById('courseForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+
+            // 检查是否有视频文件
+            const videoFile = document.getElementById('courseVideoFile').files[0];
+            const subtitleFile = document.getElementById('courseSubtitleFile').files[0];
+            let videoUrl = '';
+            let subtitleUrl = '';
+
+            // 如果有视频文件，先上传视频
+            if (videoFile) {
+                try {
+                    const formData = new FormData();
+                    formData.append('video', videoFile);
+
+                    const uploadResponse = await fetch('http://localhost:3000/api/upload/video', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (!uploadResponse.ok) {
+                        throw new Error('视频上传端点不可用。请联系管理员配置视频上传功能。');
+                    }
+
+                    const uploadResult = await uploadResponse.json();
+
+                    if (uploadResult.success) {
+                        videoUrl = uploadResult.videoUrl;
+                        alert('视频上传成功！');
+
+                        // 检查是否有手动上传的字幕文件
+                        if (subtitleFile) {
+                            // 上传字幕文件
+                            alert('正在上传字幕文件...');
+                            subtitleUrl = await uploadSubtitleFile(subtitleFile);
+
+                            if (subtitleUrl) {
+                                alert('字幕上传成功！');
+                            } else {
+                                alert('字幕上传失败。');
+                            }
+                        } else {
+                            // 没有手动上传字幕，提示用户
+                            alert('提示：本地视频文件无法自动生成字幕。\n\nAssemblyAI 需要公开可访问的视频 URL（如 YouTube、云存储链接）才能自动生成字幕。\n\n如需字幕，请：\n1. 手动上传字幕文件（VTT 或 SRT 格式），或\n2. 使用公开可访问的视频链接\n\n课程将继续创建，但不包含字幕。');
+                        }
+                    } else {
+                        alert('视频上传失败：' + uploadResult.message);
+                        return;
+                    }
+                } catch (error) {
+                    console.error('视频上传失败:', error);
+                    alert('视频上传功能暂不可用。\n\n' + error.message + '\n\n将继续创建课程，但不包含视频。');
+                    // 继续创建课程，但不包含视频
+                }
+            }
 
             const courseData = {
                 title: document.getElementById('courseTitle').value,
                 description: document.getElementById('courseDescription').value,
                 content: document.getElementById('courseContent').value,
-                videoUrl: document.getElementById('courseVideoInput').files[0]?.name || '',
                 aiToolLinks: [],
                 tasks: courseTasks, // 包含任务数据
                 createdBy: 'teacher_001'
             };
+
+            // 只在有新视频上传时才设置videoUrl，否则保持原有视频
+            if (videoUrl) {
+                courseData.videoUrl = videoUrl;
+                // 如果生成了字幕，也保存字幕URL
+                if (subtitleUrl) {
+                    courseData.subtitleUrl = subtitleUrl;
+                }
+            } else if (!currentEditingCourseId) {
+                // 创建新课程时，如果没有视频则设为空字符串
+                courseData.videoUrl = '';
+            }
+            // 编辑时如果没有新视频，不设置videoUrl字段，让服务器保留原值
 
             // 如果有AI链接，添加到aiToolLinks数组
             const aiLink = document.getElementById('courseAILink').value;
@@ -691,9 +1028,15 @@
             }
 
             try {
-                // 发送到后端API
-                const response = await fetch('http://localhost:3000/api/courses', {
-                    method: 'POST',
+                // 检查是否选择了要编辑的课程
+                if (!currentEditingCourseId) {
+                    alert('请先创建或选择一个课程进行编辑');
+                    return;
+                }
+
+                // 始终使用PUT方法更新课程
+                const response = await fetch(`http://localhost:3000/api/courses/${currentEditingCourseId}`, {
+                    method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
                     },
@@ -703,40 +1046,287 @@
                 const result = await response.json();
 
                 if (result.success) {
-                    alert('课程创建成功！\n\n课程标题：' + courseData.title + '\n任务数量：' + courseTasks.length);
+                    alert('课程保存成功！\n\n课程标题：' + courseData.title + '\n任务数量：' + courseTasks.length);
 
-                    // 重置表单和任务列表
-                    e.target.reset();
-                    document.getElementById('courseVideoPreview').style.display = 'none';
-                    courseTasks = [];
-                    renderTasks();
+                    // 刷新课程列表
+                    await loadExistingCourses();
+
+                    // 保持在编辑模式，重新加载当前课程
+                    await editCourse(currentEditingCourseId);
                 } else {
-                    alert('课程创建失败：' + result.message);
+                    alert('课程保存失败：' + result.message);
                 }
             } catch (error) {
-                console.error('创建课程时出错:', error);
-                alert('创建课程失败，请确保后端服务器已启动。\n\n错误信息：' + error.message);
+                console.error('保存课程时出错:', error);
+                alert('保存课程失败，请确保后端服务器已启动。\n\n错误信息：' + error.message);
             }
         });
         
         // ==================== 作业表单提交 ====================
-        document.getElementById('homeworkForm').addEventListener('submit', (e) => {
+        document.getElementById('homeworkForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
+            // 生成唯一的作业ID
+            const homeworkId = 'hw_' + Date.now();
+
+            // 获取当前用户信息
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
             const homeworkData = {
+                id: homeworkId,
                 title: document.getElementById('homeworkTitle').value,
                 description: document.getElementById('homeworkDescription').value,
-                aiLink: document.getElementById('homeworkAILink').value,
-                deadline: document.getElementById('homeworkDeadline').value,
-                createdAt: new Date().toISOString()
+                aiToolLinks: document.getElementById('homeworkAILink').value ? [
+                    {
+                        name: 'AI工具',
+                        url: document.getElementById('homeworkAILink').value
+                    }
+                ] : [],
+                deadline: document.getElementById('homeworkDeadline').value ?
+                    new Date(document.getElementById('homeworkDeadline').value).toISOString() : null,
+                createdAt: new Date().toISOString(),
+                createdBy: currentUser ? currentUser.id : 'teacher_001',
+                status: 'active'
             };
-            
-            // 这里暂时只是显示提示，实际应该发送到后端
-            alert('作业布置成功！\n\n作业标题：' + homeworkData.title + '\n\n注意：当前为演示模式，数据未保存到服务器。');
-            
-            // 重置表单
-            e.target.reset();
+
+            try {
+                const response = await fetch('http://localhost:3000/api/homework', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(homeworkData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('作业布置成功！\n\n作业标题：' + homeworkData.title);
+                    // 重置表单
+                    e.target.reset();
+                } else {
+                    alert('作业布置失败：' + result.message);
+                }
+            } catch (error) {
+                console.error('布置作业失败:', error);
+                alert('作业布置失败，请稍后重试');
+            }
         });
+
+        // ==================== 作业监控功能 ====================
+        // 获取所有作业提交情况
+        async function loadHomeworkSubmissions() {
+            try {
+                // 获取所有作业
+                const homeworkResponse = await fetch('http://localhost:3000/api/homework');
+                const homeworkData = await homeworkResponse.json();
+
+                // 获取所有作业提交记录（从服务器API获取）
+                const submissionsResponse = await fetch('http://localhost:3000/api/submissions');
+                const submissionsData = await submissionsResponse.json();
+
+                // 将提交记录数组转换为对象格式（为了兼容现有代码）
+                const submissions = {};
+                if (submissionsData.success && submissionsData.submissions) {
+                    submissionsData.submissions.forEach(sub => {
+                        submissions[sub.id] = sub;
+                    });
+                }
+
+                if (homeworkData.success && homeworkData.homework) {
+                    displayHomeworkStats(homeworkData.homework, submissions);
+                    displayStudentHomework(homeworkData.homework, submissions);
+                }
+            } catch (error) {
+                console.error('获取作业提交情况失败:', error);
+            }
+        }
+
+        // 显示作业统计
+        function displayHomeworkStats(homeworkList, submissions) {
+            const container = document.getElementById('homeworkStatsList');
+
+            if (homeworkList.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-secondary);">暂无作业</p>';
+                return;
+            }
+
+            let html = '<ul class="item-list">';
+            homeworkList.forEach(hw => {
+                // 统计该作业的提交情况
+                const submittedCount = Object.values(submissions).filter(
+                    sub => sub.homeworkId === hw.id
+                ).length;
+
+                const statusColor = submittedCount > 0 ? 'var(--success-color)' : 'var(--warning-color)';
+
+                html += `
+                    <li class="item-card">
+                        <div class="item-header">
+                            <span class="item-title">${hw.title}</span>
+                            <span style="color: ${statusColor}; font-weight: 600;">
+                                ${submittedCount} 人已提交
+                            </span>
+                        </div>
+                        <div class="item-content">
+                            ${hw.description}
+                        </div>
+                        <div class="item-meta">
+                            截止日期: ${hw.deadline ? new Date(hw.deadline).toLocaleDateString('zh-CN') : '无'}
+                        </div>
+                    </li>
+                `;
+            });
+            html += '</ul>';
+            container.innerHTML = html;
+        }
+
+        // 显示学生作业详情
+        function displayStudentHomework(homeworkList, submissions) {
+            const container = document.getElementById('studentHomeworkList');
+
+            const submissionArray = Object.entries(submissions);
+
+            if (submissionArray.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-secondary);">暂无学生提交作业</p>';
+                return;
+            }
+
+            let html = '<ul class="item-list">';
+            submissionArray.forEach(([submissionId, submission]) => {
+                const homework = homeworkList.find(hw => hw.id === submission.homeworkId);
+                const homeworkTitle = homework ? homework.title : '未知作业';
+
+                // 判断是否有文件
+                const hasFile = submission.fileUrl && submission.fileUrl !== '纯文字提交';
+                const fileButtons = hasFile ? `
+                    <button class="btn btn-primary" onclick="viewSubmissionFile('${submission.fileUrl}', '${submission.fileName || ''}', '${submission.mimetype || ''}')">
+                        👁️ 查看文件
+                    </button>
+                    <button class="btn btn-secondary" onclick="downloadSubmissionFile('${submission.fileUrl}', '${submission.fileName || ''}')">
+                        📥 下载文件
+                    </button>
+                ` : '';
+
+                html += `
+                    <li class="item-card">
+                        <div class="item-header">
+                            <div>
+                                <span class="item-title">学生ID: ${submission.studentId || '未知'}</span>
+                                <span style="color: var(--text-secondary); margin-left: 10px;">作业: ${homeworkTitle}</span>
+                            </div>
+                            <span style="color: var(--success-color); font-weight: 600;">✓ 已提交</span>
+                        </div>
+                        <div class="item-content">
+                            <strong>作业说明：</strong>${submission.note || '无'}
+                        </div>
+                        <div class="item-meta">
+                            文件: ${submission.fileName || '纯文字提交'} |
+                            提交时间: ${formatDateTime(submission.submittedAt)}
+                        </div>
+                        ${hasFile ? `<div class="item-actions" style="margin-top: 12px; display: flex; gap: 8px;">
+                            ${fileButtons}
+                        </div>` : ''}
+                    </li>
+                `;
+            });
+            html += '</ul>';
+            container.innerHTML = html;
+        }
+
+        // 查看提交的文件
+        function viewSubmissionFile(fileUrl, fileName, mimetype) {
+            if (!fileUrl) {
+                alert('文件不存在');
+                return;
+            }
+
+            // 创建模态框显示文件
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.8);
+                z-index: 10000;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+            `;
+
+            const closeBtn = document.createElement('button');
+            closeBtn.textContent = '✕ 关闭';
+            closeBtn.className = 'btn btn-secondary';
+            closeBtn.style.cssText = `
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                z-index: 10001;
+            `;
+            closeBtn.onclick = () => document.body.removeChild(modal);
+
+            const content = document.createElement('div');
+            content.style.cssText = `
+                max-width: 90%;
+                max-height: 90%;
+                background-color: white;
+                border-radius: 8px;
+                padding: 20px;
+                overflow: auto;
+            `;
+
+            // 根据文件类型显示不同的内容
+            if (mimetype && mimetype.startsWith('image/')) {
+                // 图片预览
+                const img = document.createElement('img');
+                img.src = fileUrl;
+                img.style.cssText = 'max-width: 100%; max-height: 80vh; object-fit: contain;';
+                content.appendChild(img);
+            } else if (mimetype && mimetype.startsWith('video/')) {
+                // 视频预览
+                const video = document.createElement('video');
+                video.src = fileUrl;
+                video.controls = true;
+                video.style.cssText = 'max-width: 100%; max-height: 80vh;';
+                content.appendChild(video);
+            } else if (fileName && (fileName.endsWith('.html') || fileName.endsWith('.htm'))) {
+                // HTML文件预览
+                const iframe = document.createElement('iframe');
+                iframe.src = fileUrl;
+                iframe.style.cssText = 'width: 100%; height: 80vh; border: none;';
+                content.appendChild(iframe);
+            } else {
+                // 其他文件类型，显示下载链接
+                content.innerHTML = `
+                    <h3>文件: ${fileName}</h3>
+                    <p>此文件类型无法预览，请下载查看。</p>
+                    <a href="${fileUrl}" download="${fileName}" class="btn btn-primary">📥 下载文件</a>
+                `;
+            }
+
+            modal.appendChild(closeBtn);
+            modal.appendChild(content);
+            document.body.appendChild(modal);
+        }
+
+        // 下载提交的文件
+        function downloadSubmissionFile(fileUrl, fileName) {
+            if (!fileUrl) {
+                alert('文件不存在');
+                return;
+            }
+
+            const a = document.createElement('a');
+            a.href = fileUrl;
+            a.download = fileName || 'homework_file';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
 
         // ==================== 学生进度监控 ====================
         // 获取所有学生进度
@@ -865,20 +1455,270 @@
             });
         }
 
-        // 刷新进度数据
-        document.getElementById('refreshProgressBtn').addEventListener('click', async () => {
-            await loadStuckStudents();
-            await loadAllProgress();
+        // 注意：刷新按钮和标签页切换的事件监听器已移到 DOMContentLoaded 中
+
+        // ==================== 课程管理功能 ====================
+        let currentEditingCourseId = null;
+
+        // 创建新的空白课程
+        async function createNewEmptyCourse() {
+            try {
+                const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
+                const emptyCourseData = {
+                    title: '新课程（未命名）',
+                    description: '请编辑课程描述',
+                    content: '',
+                    videoUrl: '',
+                    aiToolLinks: [],
+                    tasks: [],
+                    createdBy: currentUser ? currentUser.id : 'teacher_001'
+                };
+
+                const response = await fetch('http://localhost:3000/api/courses', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(emptyCourseData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    const newCourse = result.course;
+
+                    // 刷新课程列表
+                    await loadExistingCourses();
+
+                    // 自动加载新课程到编辑表单
+                    await editCourse(newCourse.id);
+
+                    // 显示提示信息
+                    alert('新课程已创建！\n\n请在下方编辑课程内容。');
+                } else {
+                    alert('创建课程失败：' + result.message);
+                }
+            } catch (error) {
+                console.error('创建空白课程失败:', error);
+                alert('创建课程失败，请确保后端服务器已启动。\n\n错误信息：' + error.message);
+            }
+        }
+
+        // 绑定创建新课程按钮事件
+        document.getElementById('createNewCourseBtn').addEventListener('click', () => {
+            createNewEmptyCourse();
         });
 
-        // 标签页切换时加载数据
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', async () => {
-                if (btn.dataset.tab === 'progress') {
+        // 加载现有课程列表
+        async function loadExistingCourses() {
+            try {
+                const response = await fetch('http://localhost:3000/api/courses');
+                const data = await response.json();
+
+                const container = document.getElementById('existingCoursesList');
+
+                if (data.success && data.courses) {
+                    if (data.courses.length === 0) {
+                        container.innerHTML = '<p style="color: var(--text-secondary); text-align: center;">暂无课程</p>';
+                        return;
+                    }
+
+                    let html = '<ul class="item-list">';
+                    data.courses.forEach(course => {
+                        const hasVideo = course.videoUrl && course.videoUrl.trim() !== '';
+                        const taskCount = course.tasks ? course.tasks.length : 0;
+                        const videoStatus = hasVideo ? '✅ 有视频' : '❌ 无视频';
+                        const videoColor = hasVideo ? 'var(--success-color)' : 'var(--text-secondary)';
+
+                        html += `
+                            <li class="item-card">
+                                <div class="item-header">
+                                    <span class="item-title">${course.title}</span>
+                                    <div class="item-actions">
+                                        <button class="btn btn-secondary" onclick="editCourse('${course.id}')">
+                                            ✏️ 编辑
+                                        </button>
+                                        <button class="btn btn-secondary" onclick="deleteCourse('${course.id}', '${course.title.replace(/'/g, "\\'")}')">
+                                            🗑️ 删除
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="item-content">
+                                    ${course.description}
+                                </div>
+                                <div class="item-meta">
+                                    <span style="color: ${videoColor};">${videoStatus}</span> |
+                                    任务数: ${taskCount} |
+                                    创建时间: ${formatDateTime(course.createdAt)}
+                                </div>
+                            </li>
+                        `;
+                    });
+                    html += '</ul>';
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = '<p style="color: var(--error-color); text-align: center;">加载课程失败</p>';
+                }
+            } catch (error) {
+                console.error('加载课程列表失败:', error);
+                const container = document.getElementById('existingCoursesList');
+                container.innerHTML = '<p style="color: var(--error-color); text-align: center;">加载课程失败，请检查后端服务</p>';
+            }
+        }
+
+        // 删除课程
+        async function deleteCourse(courseId, courseTitle) {
+            if (!confirm(`确定要删除课程"${courseTitle}"吗？此操作无法撤销。`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://localhost:3000/api/courses/${courseId}`, {
+                    method: 'DELETE'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('课程删除成功！');
+                    // 重新加载课程列表
+                    await loadExistingCourses();
+                } else {
+                    alert('删除课程失败: ' + data.message);
+                }
+            } catch (error) {
+                console.error('删除课程失败:', error);
+                alert('删除课程失败，请稍后重试');
+            }
+        }
+
+        // 编辑课程
+        async function editCourse(courseId) {
+            try {
+                const response = await fetch(`http://localhost:3000/api/courses/${courseId}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    const course = data.course;
+
+                    // 填充表单
+                    document.getElementById('courseTitle').value = course.title;
+                    document.getElementById('courseDescription').value = course.description;
+                    document.getElementById('courseContent').value = course.content || '';
+
+                    // 显示现有视频信息（文件输入框无法预填充）
+                    if (course.videoUrl) {
+                        videoFilePreview.style.display = 'block';
+                        videoFileName.textContent = '当前视频: ' + course.videoUrl.split('/').pop();
+                    }
+
+                    // 正确提取AI工具链接
+                    document.getElementById('courseAILink').value = course.aiToolLinks && course.aiToolLinks.length > 0 ? course.aiToolLinks[0].url : '';
+
+                    // 加载任务列表
+                    courseTasks = [];
+                    if (course.tasks && course.tasks.length > 0) {
+                        // 将课程的任务添加到courseTasks数组
+                        courseTasks = course.tasks.map(task => ({
+                            taskId: task.taskId || `task_${Date.now()}_${Math.random()}`,
+                            taskType: task.taskType || 'ai_chat',
+                            taskTitle: task.taskTitle || '',
+                            taskDescription: task.taskDescription || '',
+                            taskParams: task.taskParams || {
+                                aiPlatform: 'DeepSeek',
+                                promptTemplate: '',
+                                expectedLength: ''
+                            },
+                            order: task.order || 0
+                        }));
+                    }
+                    // 渲染任务列表
+                    renderTasks();
+
+                    // 更新表单标题和提示
+                    document.getElementById('courseFormTitle').textContent = '✏️ 编辑课程';
+                    document.getElementById('courseFormHint').textContent = '正在编辑：' + course.title;
+                    document.getElementById('courseFormHint').style.color = 'var(--success-color)';
+
+                    // 启用保存按钮
+                    document.getElementById('courseSubmitBtn').disabled = false;
+
+                    // 设置当前编辑的课程ID
+                    currentEditingCourseId = courseId;
+
+                    // 滚动到表单顶部
+                    const formCard = document.querySelector('#courseForm').closest('.form-card');
+                    if (formCard) {
+                        formCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                } else {
+                    alert('加载课程失败: ' + data.message);
+                }
+            } catch (error) {
+                console.error('加载课程失败:', error);
+                alert('加载课程失败，请稍后重试');
+            }
+        }
+
+        // ==================== 页面初始化和自动刷新 ====================
+        // 页面加载时自动获取卡住的学生信息
+        async function initializeDashboard() {
+            // 加载卡住的学生
+            await loadStuckStudents();
+            // 加载所有学生进度
+            await loadAllProgress();
+        }
+
+        // 自动刷新卡住的学生信息（每30秒检查一次）
+        function startAutoRefresh() {
+            setInterval(async () => {
+                // 只在进度监控标签页激活时自动刷新
+                const progressTab = document.querySelector('[data-tab="progress"]');
+                if (progressTab && progressTab.classList.contains('active')) {
                     await loadStuckStudents();
                     await loadAllProgress();
                 }
+            }, 30000); // 30秒
+        }
+
+        // 页面加载完成后执行初始化
+        window.addEventListener('DOMContentLoaded', () => {
+            // 绑定刷新按钮事件
+            const refreshBtn = document.getElementById('refreshProgressBtn');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', async () => {
+                    await loadStuckStudents();
+                    await loadAllProgress();
+                });
+            }
+
+            // 绑定作业监控刷新按钮事件
+            const refreshHomeworkBtn = document.getElementById('refreshHomeworkBtn');
+            if (refreshHomeworkBtn) {
+                refreshHomeworkBtn.addEventListener('click', async () => {
+                    await loadHomeworkSubmissions();
+                });
+            }
+
+            // 绑定标签页切换事件
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    if (btn.dataset.tab === 'progress') {
+                        await loadStuckStudents();
+                        await loadAllProgress();
+                    } else if (btn.dataset.tab === 'courses') {
+                        await loadExistingCourses();
+                    } else if (btn.dataset.tab === 'homework-monitor') {
+                        await loadHomeworkSubmissions();
+                    }
+                });
             });
+
+            // 初始化仪表板
+            initializeDashboard();
+            // 启动自动刷新
+            startAutoRefresh();
         });
     </script>
 </body>

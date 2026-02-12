@@ -1,4 +1,24 @@
+# 环境变量和API密钥
 main_proj/.env
+.env
+
+# 依赖
 main_proj/node_modules/
 node_modules/
-.env
+
+# IDE配置
+.claude/
+.vscode/
+
+# 用户数据
+main_proj/data/homework_submissions/
+main_proj/data/videos/
+
+# 日志文件
+*.log
+main_proj/server.log
+
+# 系统文件
+nul
+.DS_Store
+Thumbs.db

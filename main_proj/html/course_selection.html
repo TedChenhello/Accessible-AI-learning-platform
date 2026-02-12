@@ -264,6 +264,33 @@
             transform: translateY(-2px);
         }
 
+        /* ==================== 教师模式按钮样式 ==================== */
+        .course-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+            width: 100%;
+        }
+
+        .course-actions .course-button {
+            flex: 1;
+        }
+
+        .edit-btn {
+            background-color: #ff9800;
+        }
+
+        .edit-btn:hover {
+            background-color: #e68900;
+        }
+
+        .delete-btn {
+            background-color: #f44336;
+        }
+
+        .delete-btn:hover {
+            background-color: #da190b;
+        }
+
         /* ==================== 添加课程卡片（教师模式） - 线性布局 ==================== */
         .add-course-card {
             background-color: var(--bg-primary);
@@ -575,6 +602,8 @@
         if (userMode === 'teacher') {
             console.log('配置教师模式界面...');
             userModeBadge.textContent = '教师模式';
+            // 使用网格布局（类似听障模式）
+            document.body.classList.add('hearing-mode');
             // 显示教师专用按钮和卡片
             if (assignHomeworkBtn) assignHomeworkBtn.style.display = 'block';
             if (addCourseCard) addCourseCard.style.display = 'flex';
@@ -634,9 +663,31 @@
             const completedCourses = JSON.parse(localStorage.getItem('completedCourses') || '[]');
             const isCompleted = completedCourses.includes(course.id);
 
-            const buttonClass = isCompleted ? 'course-button completed' : 'course-button';
-            const buttonText = isCompleted ? '✓ 已完成' : '开始学习';
-            const buttonLabel = isCompleted ? `${course.title}课程已完成，点击重新学习` : `开始学习${course.title}课程`;
+            let buttonsHTML = '';
+
+            if (userMode === 'teacher') {
+                // 教师模式：显示编辑和删除按钮
+                buttonsHTML = `
+                    <div class="course-actions">
+                        <button class="course-button edit-btn" data-course-id="${course.id}" aria-label="编辑${course.title}课程">
+                            ✏️ 编辑课程
+                        </button>
+                        <button class="course-button delete-btn" data-course-id="${course.id}" aria-label="删除${course.title}课程">
+                            🗑️ 删除课程
+                        </button>
+                    </div>
+                `;
+            } else {
+                // 学生模式：显示开始学习按钮
+                const buttonClass = isCompleted ? 'course-button completed' : 'course-button';
+                const buttonText = isCompleted ? '✓ 已完成' : '开始学习';
+                const buttonLabel = isCompleted ? `${course.title}课程已完成，点击重新学习` : `开始学习${course.title}课程`;
+                buttonsHTML = `
+                    <button class="${buttonClass}" aria-label="${buttonLabel}">
+                        ${buttonText}
+                    </button>
+                `;
+            }
 
             article.innerHTML = `
                 <div class="course-thumbnail" aria-hidden="true">🎓</div>
@@ -650,20 +701,30 @@
                         <span>任务数量：${taskCount}个任务</span>
                     </div>
                 </div>
-                <button class="${buttonClass}" aria-label="${buttonLabel}">
-                    ${buttonText}
-                </button>
+                ${buttonsHTML}
             `;
 
-            // 添加点击事件
-            article.addEventListener('click', function() {
-                if (userMode === 'teacher') {
+            // 添加事件监听
+            if (userMode === 'teacher') {
+                // 教师模式：为编辑和删除按钮添加事件
+                const editBtn = article.querySelector('.edit-btn');
+                const deleteBtn = article.querySelector('.delete-btn');
+
+                editBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
                     window.location.href = `teacher_dashboard.html?action=edit&courseId=${course.id}`;
-                } else {
-                    // 学生模式：跳转到统一的课程学习页面
+                });
+
+                deleteBtn.addEventListener('click', async function(e) {
+                    e.stopPropagation();
+                    await deleteCourse(course.id, course.title);
+                });
+            } else {
+                // 学生模式：整个卡片可点击
+                article.addEventListener('click', function() {
                     window.location.href = `course_learning.html?courseId=${course.id}&mode=${userMode}`;
-                }
-            });
+                });
+            }
 
             // 插入到"添加课程"卡片之前
             const addCourseCard = document.getElementById('addCourseCard');
@@ -671,6 +732,35 @@
                 container.insertBefore(article, addCourseCard);
             } else {
                 container.appendChild(article);
+            }
+        }
+
+        // 删除课程
+        async function deleteCourse(courseId, courseTitle) {
+            if (!confirm(`确定要删除课程"${courseTitle}"吗？此操作不可恢复。`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://localhost:3000/api/courses/${courseId}`, {
+                    method: 'DELETE'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('课程已删除');
+                    // 移除DOM中的课程卡片
+                    const courseCard = document.querySelector(`[data-course-id="${courseId}"]`);
+                    if (courseCard) {
+                        courseCard.remove();
+                    }
+                } else {
+                    alert('删除失败: ' + data.message);
+                }
+            } catch (error) {
+                console.error('删除课程失败:', error);
+                alert('删除失败，请稍后重试');
             }
         }
 

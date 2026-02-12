@@ -41,36 +41,62 @@
             min-height: 100vh;
         }
         
-        /* ==================== 顶部导航栏 ==================== */
+        /* ==================== 顶部导航栏 - 线性布局 ==================== */
         .top-nav {
             background-color: var(--accent-color);
             color: white;
-            padding: var(--spacing-md) var(--spacing-lg);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            padding: var(--spacing-lg);
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        
+
         .nav-title {
-            font-size: 20px;
+            font-size: 24px;
             font-weight: 600;
+            margin-bottom: var(--spacing-md);
+            text-align: center;
         }
-        
+
+        .user-mode-badge {
+            background-color: rgba(255,255,255,0.3);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 16px;
+            display: block;
+            text-align: center;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .nav-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
         .nav-btn {
             background-color: rgba(255,255,255,0.2);
             color: white;
             border: 2px solid white;
-            padding: 8px 16px;
+            padding: 16px 24px;
             border-radius: 8px;
-            font-size: 14px;
+            font-size: 18px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
+            min-height: 56px;
+            text-align: left;
+            width: 100%;
         }
-        
+
         .nav-btn:hover {
             background-color: rgba(255,255,255,0.3);
+            transform: translateX(4px);
+        }
+
+        .nav-btn:focus {
+            outline: 3px solid white;
+            outline-offset: 2px;
         }
         
         /* ==================== 主容器 ==================== */
@@ -231,66 +257,304 @@
             opacity: 1;
             transition: opacity 0.3s;
         }
+
+        /* ==================== 用户模式提示 ==================== */
+        .mode-notice {
+            background-color: #e3f2fd;
+            border-left: 4px solid var(--accent-color);
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+            border-radius: 4px;
+        }
+
+        .mode-notice-title {
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        /* ==================== 视障用户专用样式 ==================== */
+        .visual-impaired-layout {
+            display: none;
+        }
+
+        .visual-impaired-layout.active {
+            display: block;
+        }
+
+        .hearing-impaired-layout {
+            display: none;
+        }
+
+        .hearing-impaired-layout.active {
+            display: block;
+        }
+
+        /* 视障用户：线性排布样式 */
+        .vi-homework-item {
+            background-color: var(--bg-primary);
+            border: 4px solid var(--accent-color);
+            border-radius: 16px;
+            padding: var(--spacing-xl);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .vi-homework-number {
+            display: inline-block;
+            width: 60px;
+            height: 60px;
+            background-color: var(--accent-color);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 60px;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .vi-homework-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .vi-homework-desc {
+            font-size: 24px;
+            line-height: 1.8;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .vi-homework-meta {
+            font-size: 20px;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .vi-btn {
+            width: 100%;
+            padding: var(--spacing-xl);
+            font-size: 28px;
+            font-weight: 700;
+            border: none;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-height: 80px;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .vi-btn-primary {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .vi-btn-primary:hover,
+        .vi-btn-primary:focus {
+            background-color: #1557b0;
+            transform: scale(1.02);
+        }
+
+        .vi-btn-secondary {
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 3px solid var(--border-color);
+        }
+
+        .vi-btn-secondary:hover,
+        .vi-btn-secondary:focus {
+            background-color: var(--border-color);
+        }
+
+        .vi-section-title {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: var(--spacing-xl);
+            text-align: center;
+        }
+
+        .vi-form-group {
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .vi-form-label {
+            display: block;
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .vi-form-input,
+        .vi-form-textarea,
+        .vi-form-select {
+            width: 100%;
+            padding: var(--spacing-lg);
+            font-size: 22px;
+            border: 3px solid var(--border-color);
+            border-radius: 12px;
+            transition: border-color 0.2s;
+        }
+
+        .vi-form-input:focus,
+        .vi-form-textarea:focus,
+        .vi-form-select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.2);
+        }
+
+        .vi-form-textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .vi-file-upload-area {
+            border: 4px dashed var(--accent-color);
+            border-radius: 16px;
+            padding: var(--spacing-xl);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background-color: rgba(26, 115, 232, 0.05);
+        }
+
+        .vi-file-upload-area:hover {
+            background-color: rgba(26, 115, 232, 0.1);
+            transform: scale(1.01);
+        }
+
+        .vi-file-upload-icon {
+            font-size: 80px;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .vi-file-upload-text {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .vi-file-preview {
+            margin-top: var(--spacing-lg);
+            padding: var(--spacing-lg);
+            background-color: var(--bg-secondary);
+            border-radius: 12px;
+            font-size: 20px;
+        }
     </style>
 </head>
 <body>
-    <!-- 顶部导航栏 -->
-    <nav class="top-nav">
-        <div class="nav-title">📝 我的作业</div>
-        <button class="nav-btn" id="returnBtn" aria-label="返回课程选择页面">
-            ← 返回
-        </button>
+    <!-- 顶部导航栏 - 线性布局 -->
+    <nav class="top-nav" role="navigation" aria-label="主导航">
+        <h1 class="nav-title">📝 我的作业</h1>
+        <div class="user-mode-badge" id="userModeBadge" role="status" aria-live="polite">
+            正在加载用户模式...
+        </div>
+        <div class="nav-buttons">
+            <button class="nav-btn" id="returnBtn" aria-label="返回课程选择页面">
+                ← 返回课程选择
+            </button>
+        </div>
     </nav>
     
     <!-- 主容器 -->
     <div class="container">
-        <!-- 作业列表 -->
-        <div class="card">
-            <h2 class="card-title">📋 待完成作业</h2>
-            <ul class="homework-list" id="homeworkList">
-                <!-- 示例作业 -->
-                <li class="homework-item">
-                    <h3 class="homework-title">作业1：使用AI生成一张风景图片</h3>
-                    <p class="homework-desc">使用AI图像生成工具创建一张风景图片，要求包含山、水、天空等元素。</p>
-                    <p class="homework-meta">截止日期：2024-12-31 | 状态：未提交</p>
-                    <a href="https://www.midjourney.com" class="homework-link" target="_blank" rel="noopener">
-                        🔗 前往AI工具
-                    </a>
-                </li>
-            </ul>
+        <!-- 听障用户布局 -->
+        <div class="hearing-impaired-layout" id="hearingImpairedLayout">
+            <!-- 用户模式提示 -->
+            <div class="mode-notice">
+                <div class="mode-notice-title">👂 听障用户专用界面</div>
+                <p>此界面专为听障用户优化，提供清晰的视觉信息展示。</p>
+            </div>
+
+            <!-- 作业列表 -->
+            <div class="card">
+                <h2 class="card-title">📋 待完成作业</h2>
+                <ul class="homework-list" id="homeworkList">
+                    <!-- 作业将动态加载 -->
+                </ul>
+            </div>
+
+            <!-- 作业提交表单 -->
+            <div class="card">
+                <h2 class="card-title">📤 提交作业</h2>
+                <form id="submissionForm">
+                    <div class="form-group">
+                        <label class="form-label" for="homeworkSelect">选择作业 *</label>
+                        <select id="homeworkSelect" class="form-input" required>
+                            <option value="">请选择要提交的作业</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="submissionNote">作业内容 *</label>
+                        <textarea id="submissionNote" class="form-textarea"
+                                  placeholder="请输入您的作业内容、使用的AI工具、创作过程等..." required></textarea>
+                        <p class="form-hint">可以直接输入文字内容，或上传文件</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">上传作业文件（可选）</label>
+                        <div class="file-upload-area" onclick="document.getElementById('fileInput').click()">
+                            <div style="font-size: 48px; margin-bottom: 8px;">📁</div>
+                            <div>点击上传文件（支持图片、视频、HTML等格式）</div>
+                        </div>
+                        <input type="file" id="fileInput" class="file-input"
+                               accept="image/*,video/*,.html,.htm"
+                               onchange="handleFileUpload(this)">
+                        <div id="filePreview" class="file-preview" style="display:none;"></div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">提交作业</button>
+                </form>
+            </div>
         </div>
-        
-        <!-- 作业提交表单 -->
-        <div class="card">
-            <h2 class="card-title">📤 提交作业</h2>
-            <form id="submissionForm">
-                <div class="form-group">
-                    <label class="form-label" for="homeworkSelect">选择作业 *</label>
-                    <select id="homeworkSelect" class="form-input" required>
-                        <option value="">请选择要提交的作业</option>
-                        <option value="1">作业1：使用AI生成一张风景图片</option>
+
+        <!-- 视障用户布局 -->
+        <div class="visual-impaired-layout" id="visualImpairedLayout">
+            <h1 class="vi-section-title">📋 我的作业列表</h1>
+
+            <div id="viHomeworkList">
+                <!-- 作业将动态加载 -->
+            </div>
+
+            <h1 class="vi-section-title">📤 提交作业</h1>
+
+            <form id="viSubmissionForm">
+                <div class="vi-form-group">
+                    <label class="vi-form-label" for="viHomeworkSelect">选择要提交的作业 *</label>
+                    <select id="viHomeworkSelect" class="vi-form-select" required>
+                        <option value="">请选择作业</option>
                     </select>
                 </div>
-                
-                <div class="form-group">
-                    <label class="form-label" for="submissionNote">作业说明</label>
-                    <textarea id="submissionNote" class="form-textarea" 
-                              placeholder="简要说明您的作业内容、使用的AI工具、创作过程等..."></textarea>
+
+                <div class="vi-form-group">
+                    <label class="vi-form-label" for="viSubmissionNote">作业内容 *</label>
+                    <textarea id="viSubmissionNote" class="vi-form-textarea"
+                              placeholder="请输入您的作业内容、使用的AI工具、创作过程等..." required></textarea>
+                    <p style="font-size: 18px; margin-top: 8px; color: var(--text-secondary);">
+                        可以直接输入文字内容，或上传文件
+                    </p>
                 </div>
-                
-                <div class="form-group">
-                    <label class="form-label">上传作业文件 *</label>
-                    <div class="file-upload-area" onclick="document.getElementById('fileInput').click()">
-                        <div style="font-size: 48px; margin-bottom: 8px;">📁</div>
-                        <div>点击上传文件（支持图片、视频、HTML等格式）</div>
+
+                <div class="vi-form-group">
+                    <label class="vi-form-label">上传作业文件（可选）</label>
+                    <div class="vi-file-upload-area" onclick="document.getElementById('viFileInput').click()">
+                        <div class="vi-file-upload-icon">📁</div>
+                        <div class="vi-file-upload-text">点击上传文件</div>
+                        <div style="font-size: 18px; margin-top: 8px; color: var(--text-secondary);">
+                            支持图片、视频、HTML等格式
+                        </div>
                     </div>
-                    <input type="file" id="fileInput" class="file-input" 
-                           accept="image/*,video/*,.html,.htm" 
-                           onchange="handleFileUpload(this)" required>
-                    <div id="filePreview" class="file-preview" style="display:none;"></div>
+                    <input type="file" id="viFileInput" class="file-input"
+                           accept="image/*,video/*,.html,.htm"
+                           onchange="handleViFileUpload(this)">
+                    <div id="viFilePreview" class="vi-file-preview" style="display:none;"></div>
                 </div>
-                
-                <button type="submit" class="btn btn-primary">提交作业</button>
+
+                <button type="submit" class="vi-btn vi-btn-primary">提交作业</button>
             </form>
         </div>
     </div>
@@ -300,12 +564,77 @@
         const urlParams = new URLSearchParams(window.location.search);
         const userMode = urlParams.get('mode') || localStorage.getItem('userMode') || 'visual';
         localStorage.setItem('userMode', userMode);
-        
+
+        // ==================== 更新用户模式徽章 ====================
+        function updateUserModeBadge() {
+            const badge = document.getElementById('userModeBadge');
+            if (userMode === 'hearing') {
+                badge.textContent = '👂 听障用户模式';
+            } else if (userMode === 'visual') {
+                badge.textContent = '👁️ 视障用户模式';
+            } else if (userMode === 'teacher') {
+                badge.textContent = '👨‍🏫 教师模式';
+            } else {
+                badge.textContent = '👤 普通模式';
+            }
+        }
+
+        // ==================== 界面切换 ====================
+        function switchLayout() {
+            const hearingLayout = document.getElementById('hearingImpairedLayout');
+            const visualLayout = document.getElementById('visualImpairedLayout');
+
+            if (userMode === 'hearing') {
+                hearingLayout.classList.add('active');
+                visualLayout.classList.remove('active');
+
+                // 启用听障模式表单的required属性
+                document.getElementById('homeworkSelect').required = true;
+                document.getElementById('submissionNote').required = true;
+
+                // 禁用视障模式表单的required属性
+                document.getElementById('viHomeworkSelect').required = false;
+                document.getElementById('viSubmissionNote').required = false;
+            } else {
+                visualLayout.classList.add('active');
+                hearingLayout.classList.remove('active');
+
+                // 禁用听障模式表单的required属性
+                document.getElementById('homeworkSelect').required = false;
+                document.getElementById('submissionNote').required = false;
+
+                // 启用视障模式表单的required属性
+                document.getElementById('viHomeworkSelect').required = true;
+                document.getElementById('viSubmissionNote').required = true;
+            }
+        }
+
+        // 页面加载时切换布局和更新徽章
+        updateUserModeBadge();
+        switchLayout();
+
         // ==================== 返回按钮功能 ====================
         const returnBtn = document.getElementById('returnBtn');
         returnBtn.addEventListener('click', () => {
             window.location.href = `course_selection.html?mode=${userMode}`;
         });
+
+        // ==================== 获取当前学生ID ====================
+        function getCurrentStudentId() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            return currentUser ? currentUser.id : 'student_001';
+        }
+
+        // ==================== 检查作业是否已提交 ====================
+        function isHomeworkSubmitted(homeworkId) {
+            const submissions = JSON.parse(localStorage.getItem('homeworkSubmissions') || '{}');
+            const studentId = getCurrentStudentId();
+
+            // 检查是否存在该学生对该作业的提交记录
+            return Object.values(submissions).some(
+                sub => sub.studentId === studentId && sub.homeworkId === homeworkId
+            );
+        }
 
         // ==================== 动态加载作业 ====================
         async function loadHomeworkFromAPI() {
@@ -314,26 +643,49 @@
                 const result = await response.json();
 
                 if (result.success && result.homework) {
-                    const homeworkList = document.getElementById('homeworkList');
-                    const homeworkSelect = document.getElementById('homeworkSelect');
+                    // 过滤掉已提交的作业
+                    const unsubmittedHomework = result.homework.filter(hw => !isHomeworkSubmitted(hw.id));
 
-                    // 清空现有内容
-                    homeworkList.innerHTML = '';
-                    homeworkSelect.innerHTML = '<option value="">请选择要提交的作业</option>';
+                    if (userMode === 'hearing') {
+                        // 听障用户布局
+                        const homeworkList = document.getElementById('homeworkList');
+                        const homeworkSelect = document.getElementById('homeworkSelect');
 
-                    // 渲染作业列表
-                    result.homework.forEach(hw => {
-                        renderHomeworkItem(hw, homeworkList);
-                        addHomeworkOption(hw, homeworkSelect);
-                    });
+                        homeworkList.innerHTML = '';
+                        homeworkSelect.innerHTML = '<option value="">请选择要提交的作业</option>';
+
+                        if (unsubmittedHomework.length === 0) {
+                            homeworkList.innerHTML = '<p style="text-align: center; color: var(--success-color); padding: 20px;">✓ 所有作业已提交！</p>';
+                        } else {
+                            unsubmittedHomework.forEach(hw => {
+                                renderHomeworkItem(hw, homeworkList);
+                                addHomeworkOption(hw, homeworkSelect);
+                            });
+                        }
+                    } else {
+                        // 视障用户布局
+                        const viHomeworkList = document.getElementById('viHomeworkList');
+                        const viHomeworkSelect = document.getElementById('viHomeworkSelect');
+
+                        viHomeworkList.innerHTML = '';
+                        viHomeworkSelect.innerHTML = '<option value="">请选择作业</option>';
+
+                        if (unsubmittedHomework.length === 0) {
+                            viHomeworkList.innerHTML = '<div class="vi-homework-item"><h2 class="vi-homework-title">✓ 所有作业已提交！</h2></div>';
+                        } else {
+                            unsubmittedHomework.forEach((hw, index) => {
+                                renderViHomeworkItem(hw, viHomeworkList, index + 1);
+                                addHomeworkOption(hw, viHomeworkSelect);
+                            });
+                        }
+                    }
                 }
             } catch (error) {
                 console.error('加载作业失败:', error);
-                // 如果后端未启动，保留示例作业
             }
         }
 
-        // 渲染作业项
+        // 渲染听障用户作业项
         function renderHomeworkItem(homework, container) {
             const li = document.createElement('li');
             li.className = 'homework-item';
@@ -358,6 +710,33 @@
             container.appendChild(li);
         }
 
+        // 渲染视障用户作业项
+        function renderViHomeworkItem(homework, container, number) {
+            const div = document.createElement('div');
+            div.className = 'vi-homework-item';
+
+            const deadline = homework.deadline ? new Date(homework.deadline).toLocaleDateString('zh-CN') : '无截止日期';
+            const aiToolLink = homework.aiToolLinks && homework.aiToolLinks.length > 0
+                ? homework.aiToolLinks[0].url
+                : '#';
+            const aiToolName = homework.aiToolLinks && homework.aiToolLinks.length > 0
+                ? homework.aiToolLinks[0].name
+                : 'AI工具';
+
+            div.innerHTML = `
+                <div class="vi-homework-number">${number}</div>
+                <h2 class="vi-homework-title">${homework.title}</h2>
+                <p class="vi-homework-desc">${homework.description}</p>
+                <p class="vi-homework-meta">📅 截止日期：${deadline}</p>
+                <p class="vi-homework-meta">📊 状态：未提交</p>
+                ${aiToolLink !== '#' ? `<button class="vi-btn vi-btn-secondary" onclick="window.open('${aiToolLink}', '_blank')">
+                    🔗 前往${aiToolName}
+                </button>` : ''}
+            `;
+
+            container.appendChild(div);
+        }
+
         // 添加作业选项
         function addHomeworkOption(homework, select) {
             const option = document.createElement('option');
@@ -373,7 +752,7 @@
         function handleFileUpload(input) {
             const file = input.files[0];
             const preview = document.getElementById('filePreview');
-            
+
             if (file) {
                 preview.style.display = 'block';
                 preview.innerHTML = `
@@ -382,7 +761,20 @@
                 `;
             }
         }
-        
+
+        function handleViFileUpload(input) {
+            const file = input.files[0];
+            const preview = document.getElementById('viFilePreview');
+
+            if (file) {
+                preview.style.display = 'block';
+                preview.innerHTML = `
+                    <strong>已选择文件：</strong> ${file.name}
+                    <br><strong>文件大小：</strong> ${(file.size / 1024 / 1024).toFixed(2)} MB
+                `;
+            }
+        }
+
         // ==================== 通知功能 ====================
         function showNotification(message) {
             const notification = document.createElement('div');
@@ -390,9 +782,9 @@
             notification.textContent = message;
             notification.setAttribute('role', 'alert');
             notification.setAttribute('aria-live', 'assertive');
-            
+
             document.body.appendChild(notification);
-            
+
             setTimeout(() => {
                 notification.style.opacity = '0';
                 setTimeout(() => {
@@ -402,30 +794,198 @@
                 }, 300);
             }, 3000);
         }
-        
-        // ==================== 表单提交 ====================
-        document.getElementById('submissionForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            const homeworkSelect = document.getElementById('homeworkSelect').value;
-            const note = document.getElementById('submissionNote').value;
-            const file = document.getElementById('fileInput').files[0];
-            
-            if (!homeworkSelect || !file) {
-                alert('请选择作业并上传文件！');
-                return;
+
+        // ==================== 上传文件到服务器 ====================
+        async function uploadHomeworkFile(file) {
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                const response = await fetch('http://localhost:3000/api/upload/homework', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    return {
+                        fileUrl: result.fileUrl,
+                        fileName: result.originalName,
+                        mimetype: result.mimetype
+                    };
+                } else {
+                    throw new Error(result.message || '文件上传失败');
+                }
+            } catch (error) {
+                console.error('上传文件失败:', error);
+                throw error;
             }
-            
-            // 这里暂时只是显示提示，实际应该发送到后端
-            const message = '作业提交成功！\n\n注意：当前为演示模式，数据未保存到服务器。';
-            alert(message);
-            showNotification('作业提交成功！');
-            
-            // 重置表单
-            e.target.reset();
-            document.getElementById('filePreview').style.display = 'none';
-        });
-        
+        }
+
+        // ==================== 保存作业提交记录到服务器 ====================
+        async function saveHomeworkSubmission(homeworkId, fileInfo, note) {
+            try {
+                const studentId = getCurrentStudentId();
+
+                const submissionData = {
+                    homeworkId: homeworkId,
+                    studentId: studentId,
+                    note: note,
+                    fileUrl: fileInfo ? fileInfo.fileUrl : '',
+                    fileName: fileInfo ? fileInfo.fileName : '纯文字提交',
+                    mimetype: fileInfo ? fileInfo.mimetype : '',
+                    submittedAt: new Date().toISOString()
+                };
+
+                const response = await fetch('http://localhost:3000/api/submissions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(submissionData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    return true;
+                } else {
+                    throw new Error(result.message || '提交作业失败');
+                }
+            } catch (error) {
+                console.error('保存提交记录失败:', error);
+                throw error;
+            }
+        }
+
+        // ==================== 表单提交 ====================
+        // 听障用户表单提交
+        const submissionForm = document.getElementById('submissionForm');
+        if (submissionForm) {
+            submissionForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const homeworkSelect = document.getElementById('homeworkSelect').value;
+                const note = document.getElementById('submissionNote').value.trim();
+                const file = document.getElementById('fileInput').files[0];
+
+                if (!homeworkSelect) {
+                    alert('请选择作业！');
+                    return;
+                }
+
+                if (!note && !file) {
+                    alert('请输入作业内容或上传文件！');
+                    return;
+                }
+
+                try {
+                    // 显示加载提示
+                    const submitBtn = e.target.querySelector('button[type="submit"]');
+                    const originalText = submitBtn.textContent;
+                    submitBtn.textContent = '提交中...';
+                    submitBtn.disabled = true;
+
+                    let fileInfo = null;
+
+                    // 如果有文件，先上传文件
+                    if (file) {
+                        fileInfo = await uploadHomeworkFile(file);
+                    }
+
+                    // 保存提交记录到服务器
+                    await saveHomeworkSubmission(homeworkSelect, fileInfo, note);
+
+                    showNotification('作业提交成功！');
+
+                    // 重置表单
+                    e.target.reset();
+                    document.getElementById('filePreview').style.display = 'none';
+
+                    // 恢复按钮状态
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+
+                    // 延迟重新加载作业列表，避免DOM操作冲突
+                    setTimeout(() => {
+                        loadHomeworkFromAPI();
+                    }, 500);
+                } catch (error) {
+                    console.error('提交作业失败:', error);
+                    alert('提交作业失败：' + error.message);
+
+                    // 恢复按钮状态
+                    const submitBtn = e.target.querySelector('button[type="submit"]');
+                    submitBtn.textContent = '提交作业';
+                    submitBtn.disabled = false;
+                }
+            });
+        }
+
+        // 视障用户表单提交
+        const viSubmissionForm = document.getElementById('viSubmissionForm');
+        if (viSubmissionForm) {
+            viSubmissionForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const homeworkSelect = document.getElementById('viHomeworkSelect').value;
+                const note = document.getElementById('viSubmissionNote').value.trim();
+                const file = document.getElementById('viFileInput').files[0];
+
+                if (!homeworkSelect) {
+                    alert('请选择作业！');
+                    return;
+                }
+
+                if (!note && !file) {
+                    alert('请输入作业内容或上传文件！');
+                    return;
+                }
+
+                try {
+                    // 显示加载提示
+                    const submitBtn = e.target.querySelector('button[type="submit"]');
+                    const originalText = submitBtn.textContent;
+                    submitBtn.textContent = '提交中...';
+                    submitBtn.disabled = true;
+
+                    let fileInfo = null;
+
+                    // 如果有文件，先上传文件
+                    if (file) {
+                        fileInfo = await uploadHomeworkFile(file);
+                    }
+
+                    // 保存提交记录到服务器
+                    await saveHomeworkSubmission(homeworkSelect, fileInfo, note);
+
+                    showNotification('作业提交成功！');
+
+                    // 重置表单
+                    e.target.reset();
+                    document.getElementById('viFilePreview').style.display = 'none';
+
+                    // 恢复按钮状态
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+
+                    // 延迟重新加载作业列表，避免DOM操作冲突
+                    setTimeout(() => {
+                        loadHomeworkFromAPI();
+                    }, 500);
+                } catch (error) {
+                    console.error('提交作业失败:', error);
+                    alert('提交作业失败：' + error.message);
+
+                    // 恢复按钮状态
+                    const submitBtn = e.target.querySelector('button[type="submit"]');
+                    submitBtn.textContent = '提交作业';
+                    submitBtn.disabled = false;
+                }
+            });
+        }
+
     </script>
 </body>
 </html>

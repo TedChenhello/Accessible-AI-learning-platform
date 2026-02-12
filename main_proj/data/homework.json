@@ -32,7 +32,42 @@
       "createdAt": "2024-01-15T10:00:00Z",
       "createdBy": "teacher_001",
       "status": "active"
+    },
+    {
+      "id": "hw_1770825855959_d0u5vqjy5",
+      "title": "kkkkkk",
+      "description": "kk",
+      "courseId": "",
+      "deadline": null,
+      "aiToolLinks": [],
+      "tasks": [],
+      "createdAt": "2026-02-11T16:04:15.959Z",
+      "createdBy": "student_001",
+      "status": "active"
     }
   ],
-  "submissions": []
+  "submissions": [
+    {
+      "id": "sub_1770867543554_43gyllkb6",
+      "homeworkId": "hw_1770825855959_d0u5vqjy5",
+      "studentId": "student_001",
+      "note": "sdfsdfsfd",
+      "fileUrl": "/data/homework_submissions/homework-1770867543540-806600939-images.jpg",
+      "fileName": "images.jpg",
+      "mimetype": "image/jpeg",
+      "submittedAt": "2026-02-12T03:39:03.544Z",
+      "status": "submitted"
+    },
+    {
+      "id": "sub_1770871913305_4zcm6a6ks",
+      "homeworkId": "hw_001",
+      "studentId": "student_1770869151406_xww2jw0zy",
+      "note": "jhjnhj",
+      "fileUrl": "/data/homework_submissions/homework-1770871913292-456045685-images.jpg",
+      "fileName": "images.jpg",
+      "mimetype": "image/jpeg",
+      "submittedAt": "2026-02-12T04:51:53.296Z",
+      "status": "submitted"
+    }
+  ]
 }
